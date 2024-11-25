@@ -1,0 +1,11 @@
+random_state: 42
+
+paths:
+  data: "./mental_health/data"
+  schema: "./mental_health/data/schema.pkl"
+  train: "./mental_health/data/train.csv"
+  test: "./mental_health/data/test.csv"
+  train_preprocessed: "./mental_health/data/train_preprocessed.csv"
+  test_preprocessed: "./mental_health/data/test_preprocessed.csv"
+
+
