@@ -26,6 +26,6 @@ clean:
 
 ruff:
 	@echo "[INFO] Ruff checks & format"
-	@ruff check . --fix
 	@ruff format .
+	@ruff check . --fix
 
