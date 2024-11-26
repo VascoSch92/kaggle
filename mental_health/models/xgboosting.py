@@ -39,15 +39,13 @@ def train_xgboosting(
             "lambda": trial.suggest_float("lambda", 1e-3, 10.0, log=True),
             "alpha": trial.suggest_float("alpha", 1e-3, 10.0, log=True),
             "random_state": config.random_state,
+            "use_label_encoder": False,
+            "enable_categorical": True,
+            "scale_pos_weight": scale_pos_weight,
         }
 
         # Initialize the XGBClassifier
-        model = XGBClassifier(
-            **param,
-            use_label_encoder=False,
-            enable_categorical=True,
-            scale_pos_weight=scale_pos_weight,
-        )
+        model = XGBClassifier(**param)
 
         # Train the model
         model.fit(X_train, y_train, eval_set=[(X_test, y_test)], verbose=False)
@@ -70,12 +68,7 @@ def train_xgboosting(
     best_params["objective"] = "binary:logistic"
     best_params["eval_metric"] = "logloss"
 
-    best_model = XGBClassifier(
-        **best_params,
-        use_label_encoder=False,
-        enable_categorical=True,
-        scale_pos_weight=scale_pos_weight,
-    )
+    best_model = XGBClassifier(**best_params)
     best_model.fit(X_train, y_train, eval_set=[(X_test, y_test)], verbose=False)
 
     logger.info(f"Best model parameters {study.best_params}")

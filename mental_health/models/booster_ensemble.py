@@ -1,8 +1,5 @@
 import pandas as pd
-from catboost import CatBoostClassifier
-from lightgbm import LGBMClassifier
 from sklearn.ensemble import VotingClassifier
-from xgboost import XGBClassifier
 
 from mental_health.models.catboost import train_catboost
 from mental_health.models.light_lgbm import train_lightlgbm
@@ -17,7 +14,7 @@ def train_booster_ensemble(
     schema,
     config,
     logger,
-):
+) -> VotingClassifier:
     logger.info("Starting Booster Training")
     catboost = train_catboost(
         X_train=X_train,
@@ -52,8 +49,7 @@ def train_booster_ensemble(
             ("lightlgbm", lightlgbm),
             ("xgboost", xgboosting),
         ],
-        voting='hard',
+        voting="hard",
     )
     model.fit(X_train, y_train)
     return model
-

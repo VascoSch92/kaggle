@@ -31,7 +31,7 @@ def train_lightlgbm(
             "lambda_l1": trial.suggest_loguniform("lambda_l1", 1e-8, 10.0),
             "lambda_l2": trial.suggest_loguniform("lambda_l2", 1e-8, 10.0),
             "random_state": config.random_state,
-            "verbose": 0,
+            "verbose": -1,
         }
 
         cat_cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=1)
