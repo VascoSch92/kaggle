@@ -48,7 +48,7 @@ def train_catboost(
 
     logger.info("Starting study")
     study = optuna.create_study(direction="maximize")
-    study.optimize(objective, n_trials=1)
+    study.optimize(objective, n_trials=10)
 
     best_model = CatBoostClassifier(**study.best_params, verbose=False)
     best_model.fit(X_train, y_train)

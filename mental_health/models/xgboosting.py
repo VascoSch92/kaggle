@@ -64,7 +64,7 @@ def train_xgboosting(
     study = optuna.create_study(direction="maximize")
 
     # Start the optimization
-    study.optimize(objective, n_trials=1)
+    study.optimize(objective, n_trials=10)
 
     best_params = study.best_params
     best_params["objective"] = "binary:logistic"

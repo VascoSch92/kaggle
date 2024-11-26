@@ -44,7 +44,7 @@ def train_lightlgbm(
 
     logger.info("Start study")
     study = optuna.create_study(direction="maximize")
-    study.optimize(objective, n_trials=1)
+    study.optimize(objective, n_trials=10)
 
     best_model = LGBMClassifier(**study.best_params)
     best_model.fit(X_train, y_train)
