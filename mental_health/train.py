@@ -153,8 +153,8 @@ class MentalHealthTrain(Task):
     ) -> pd.DataFrame:
         stratified_k_fold = StratifiedKFold(10, shuffle=True, random_state=self.config.random_state)
         splits = stratified_k_fold.split(X, y)
-        scores, test_predictions = [], []
 
+        scores, test_predictions = [], []
         for i, (full_train_idx, valid_idx) in enumerate(splits):
             model_fold = model
             X_train_fold, X_valid_fold = X.loc[full_train_idx], X.loc[valid_idx]
