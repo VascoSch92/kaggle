@@ -123,7 +123,7 @@ class MentalHealthEtl(Task):
         def dietary_habits(diet: str) -> str:
             diet = str(diet).lower()
             if "unhealthy" in diet:
-                return "unhealty"
+                return "unhealthy"
             elif "healthy" in diet:
                 return "healthy"
             else:

@@ -2,9 +2,8 @@ import warnings
 
 import optuna
 import pandas as pd
-import lightgbm as lgb
-from lightgbm import Booster
-from sklearn.metrics import accuracy_score
+from lightgbm import LGBMClassifier
+from sklearn.model_selection import StratifiedKFold, cross_val_score
 
 warnings.filterwarnings("ignore")
 
@@ -17,12 +16,11 @@ def train_lightlgbm(
     schema,
     config,
     logger,
-) -> Booster:
+) -> LGBMClassifier:
+    logger.info("Starting LGBM Training")
+
     def objective(trial):
-        # Suggest values for hyperparameters
         param_grid = {
-            "objective": "binary",
-            "metric": "binary_error",
             "boosting_type": trial.suggest_categorical("boosting_type", ["gbdt", "dart"]),
             "num_leaves": trial.suggest_int("num_leaves", 20, 150),
             "learning_rate": trial.suggest_loguniform("learning_rate", 0.01, 0.3),
@@ -33,44 +31,25 @@ def train_lightlgbm(
             "lambda_l1": trial.suggest_loguniform("lambda_l1", 1e-8, 10.0),
             "lambda_l2": trial.suggest_loguniform("lambda_l2", 1e-8, 10.0),
             "random_state": config.random_state,
+            "verbose": 0,
         }
 
-        # Create LightGBM Dataset
-        train_data = lgb.Dataset(X_train, label=y_train, categorical_feature=schema.catvar_features())
-        valid_data = lgb.Dataset(X_test, label=y_test, reference=train_data)
+        cat_cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=1)
+        model = LGBMClassifier(**param_grid)
 
-        # Train LightGBM model
-        gbm = lgb.train(
-            param_grid,
-            train_data,
-            valid_sets=[valid_data],
-            num_boost_round=100,
-        )
+        model.fit(X_train, y_train)
+        scores = cross_val_score(model, X_train, y_train, cv=cat_cv, scoring="accuracy")
 
-        # Predict on validation set
-        preds = gbm.predict(X_test, num_iteration=gbm.best_iteration)
-        preds_binary = [1 if p > 0.5 else 0 for p in preds]
+        return scores.mean()
 
-        # Calculate accuracy
-        accuracy = accuracy_score(y_test, preds_binary)
-        return 1 - accuracy  # Minimize the error
-
-    # Create Optuna study
     logger.info("Start study")
-    study = optuna.create_study(direction="minimize")
-    study.optimize(objective, n_trials=30)
+    study = optuna.create_study(direction="maximize")
+    study.optimize(objective, n_trials=1)
 
-    # Print the best parameters
+    best_model = LGBMClassifier(**study.best_params)
+    best_model.fit(X_train, y_train)
+
     logger.info(f"Best parameters found: {study.best_params}")
-
-    train_data = lgb.Dataset(X_train, label=y_train, categorical_feature=schema.catvar_features())
-    valid_data = lgb.Dataset(X_test, label=y_test, reference=train_data)
-
-    best_model = lgb.train(
-        study.best_params,
-        train_data,
-        valid_sets=[valid_data],
-        num_boost_round=100,
-    )
+    logger.info(f"Best model score: {study.best_value}")
 
     return best_model

@@ -17,6 +17,7 @@ def train_catboost(
     config,
     logger,
 ) -> CatBoostClassifier:
+    logger.info("Starting CatBoost Training")
     _ = y_test
     X_train[schema.catvar_features()] = X_train[schema.catvar_features()].astype(int)
     X_test[schema.catvar_features()] = X_test[schema.catvar_features()].astype(int)
@@ -24,7 +25,7 @@ def train_catboost(
     def objective(trial):
         # Define the parameter space to search
         param = {
-            "iterations": trial.suggest_int("iterations", 100, 2000),
+            "iterations": trial.suggest_int("iterations", 100, 1000),
             "learning_rate": trial.suggest_loguniform("learning_rate", 1e-5, 1e-1),
             "depth": trial.suggest_int("depth", 3, 10),
             "l2_leaf_reg": trial.suggest_loguniform("l2_leaf_reg", 0.01, 10.0),
@@ -42,17 +43,12 @@ def train_catboost(
 
         # Fit the model
         model.fit(X_train, y_train)
-        # y_pred = model.predict(X_test)
-        # accuracy = accuracy_score(y_test, y_pred)
         scores = cross_val_score(model, X_train, y_train, cv=cat_cv, scoring="accuracy")
         return scores.mean()
 
-    # Create an Optuna study to maximize the accuracy
     logger.info("Starting study")
     study = optuna.create_study(direction="maximize")
-
-    # Start the optimization
-    study.optimize(objective, n_trials=10)
+    study.optimize(objective, n_trials=1)
 
     best_model = CatBoostClassifier(**study.best_params, verbose=False)
     best_model.fit(X_train, y_train)

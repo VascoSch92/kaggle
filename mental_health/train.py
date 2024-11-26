@@ -8,6 +8,7 @@ import pandas as pd
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.model_selection import train_test_split
 
+from mental_health.models.booster_ensemble import train_booster_ensemble
 from tools.task import Data, Task
 from tools.logger import log_method_call
 from tools.schema import Schema
@@ -107,6 +108,16 @@ class MentalHealthTrain(Task):
                     config=self.config,
                     logger=self.logger,
                 )
+            case "--booster-ensemble":
+                return train_booster_ensemble(
+                    X_train=X_train,
+                    y_train=y_train,
+                    X_test=X_test,
+                    y_test=y_test,
+                    schema=schema,
+                    config=self.config,
+                    logger=self.logger,
+                )
             case _:
                 raise KeyError
 
@@ -118,10 +129,6 @@ class MentalHealthTrain(Task):
         model: Any,
     ) -> None:
         y_pred = model.predict(X_test)
-
-        if self.pipeline == "--light-lgbm":
-            y_pred = [1 if p > 0.5 else 0 for p in y_pred]
-
         accuracy = accuracy_score(y_test, y_pred=y_pred)
         self.logger.info(f"Accuracy on test set: {accuracy:.2f}")
         report = classification_report(y_true=y_test, y_pred=y_pred)
@@ -131,9 +138,6 @@ class MentalHealthTrain(Task):
     def _create_and_save_submission(self, dfs: Data, model: Any) -> None:
         id = dfs.test.id
         submission_pred = model.predict(dfs.test[dfs.schema.numeric_features() + dfs.schema.catvar_features()])
-        if self.pipeline == "--light-lgbm":
-            submission_pred = [1 if p > 0.5 else 0 for p in submission_pred]
-
         output = pd.DataFrame({"id": id, "Depression": submission_pred})
         submission_identifier = str(uuid.uuid4())[:8]
         output.to_csv(Path(self.config.paths.data) / f"submission_{submission_identifier}.csv", index=False)

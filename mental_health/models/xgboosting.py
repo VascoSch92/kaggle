@@ -17,6 +17,8 @@ def train_xgboosting(
     config,
     logger,
 ) -> XGBClassifier:
+    logger.info("Starting XGBooster Training")
+
     X_train[schema.catvar_features()] = X_train[schema.catvar_features()].astype(int)
     X_test[schema.catvar_features()] = X_test[schema.catvar_features()].astype(int)
 
@@ -62,7 +64,7 @@ def train_xgboosting(
     study = optuna.create_study(direction="maximize")
 
     # Start the optimization
-    study.optimize(objective, n_trials=10)
+    study.optimize(objective, n_trials=1)
 
     best_params = study.best_params
     best_params["objective"] = "binary:logistic"
