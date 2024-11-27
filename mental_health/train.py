@@ -16,6 +16,7 @@ from mental_health.models.catboost import train_catboost
 from mental_health.models.light_lgbm import train_lightlgbm
 from mental_health.models.xgboosting import train_xgboosting
 from mental_health.models.booster_ensemble import train_booster_ensemble
+from mental_health.models.tabnet import train_tabnet
 
 
 class MentalHealthTrain(Task):
@@ -114,6 +115,16 @@ class MentalHealthTrain(Task):
                 )
             case "--booster-ensemble":
                 return train_booster_ensemble(
+                    X_train=X_train,
+                    y_train=y_train,
+                    X_test=X_val,
+                    y_test=y_val,
+                    schema=schema,
+                    config=self.config,
+                    logger=self.logger,
+                )
+            case "--tabnet":
+                return train_tabnet(
                     X_train=X_train,
                     y_train=y_train,
                     X_test=X_val,
