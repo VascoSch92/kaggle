@@ -192,6 +192,7 @@ class MentalHealthTrain(Task):
                 "Depression": np.round(np.mean(test_predictions, axis=0)),
             }
         )
+
         return submission
 
     @log_method_call
