@@ -81,16 +81,16 @@ class MentalHealthEtl(Task):
     @log_method_call
     def _correct_misspelled_cities_names(self, dfs: Data) -> Data:
         def correct(city: str) -> str:
-            if city in {'Golkata', 'Molkata', 'Tolkata', 'Rolkata'}:
-                return 'Kolkata'
-            if city in {'Ghopal', 'Mhopal'}:
-                return 'Bhopal'
-            if city == 'Khaziabad':
-                return 'Ghaziabad'
+            if city in {"Golkata", "Molkata", "Tolkata", "Rolkata"}:
+                return "Kolkata"
+            if city in {"Ghopal", "Mhopal"}:
+                return "Bhopal"
+            if city == "Khaziabad":
+                return "Ghaziabad"
             return city
 
-        dfs.train['City'] = dfs.train['City'].apply(lambda c: correct(c))
-        dfs.test['City'] = dfs.test['City'].apply(lambda c: correct(c))
+        dfs.train["City"] = dfs.train["City"].apply(lambda c: correct(c))
+        dfs.test["City"] = dfs.test["City"].apply(lambda c: correct(c))
         return dfs
 
     @log_method_call
@@ -102,44 +102,44 @@ class MentalHealthEtl(Task):
     @log_method_call
     def _correct_profession_column(self, dfs: Data) -> Data:
         def correct(profession: str) -> str:
-            if profession in {'Finanancial Analyst'}:
-                return 'Financial Analyst'
-            if profession in {'City Manager'}:
-                return 'Manager'
-            if profession in {'Family Consultant', 'City Consultant'}:
-                return 'Consultant'
-            if profession in {'MBA', 'BCA'}:
-                return 'Business Analyst'
-            if profession in {'Dev'}:
+            if profession in {"Finanancial Analyst"}:
+                return "Financial Analyst"
+            if profession in {"City Manager"}:
+                return "Manager"
+            if profession in {"Family Consultant", "City Consultant"}:
+                return "Consultant"
+            if profession in {"MBA", "BCA"}:
+                return "Business Analyst"
+            if profession in {"Dev"}:
                 return "Software Engineer"
-            if profession in {'M.Pharm'}:
-                return 'Pharmacist'
-            if profession in {'Doctor', 'Medical Doctor'}:
-                return 'Doctor'
-            if profession in {'Civil Engineer', 'Mechanical Engineer'}:
-                return 'Engineer'
-            if profession in {'UX/UI Designer'}:
-                return 'Graphic Designer'
-            if profession in {'Educational Consultant'}:
-                return 'Consultant'
-            if profession in {'B.Ed', 'M.Ed'}:
-                return 'Teacher'
-            if profession in {'Chemist'}:
-                return 'Pharmacist'
-            if profession in {'Judge', 'LLM'}:
-                return 'Lawyer'
-            if profession in {'MCA', 'ME', 'M.Tech', 'BE'}:
-                return 'Engineer'
-            if profession in {'PhD', 'Research Analyst'}:
-                return 'Researcher'
-            if profession in {'Unemployed'}:
-                return 'Unemployed'
-            if profession in {'Student'}:
-                return 'Student'
+            if profession in {"M.Pharm"}:
+                return "Pharmacist"
+            if profession in {"Doctor", "Medical Doctor"}:
+                return "Doctor"
+            if profession in {"Civil Engineer", "Mechanical Engineer"}:
+                return "Engineer"
+            if profession in {"UX/UI Designer"}:
+                return "Graphic Designer"
+            if profession in {"Educational Consultant"}:
+                return "Consultant"
+            if profession in {"B.Ed", "M.Ed"}:
+                return "Teacher"
+            if profession in {"Chemist"}:
+                return "Pharmacist"
+            if profession in {"Judge", "LLM"}:
+                return "Lawyer"
+            if profession in {"MCA", "ME", "M.Tech", "BE"}:
+                return "Engineer"
+            if profession in {"PhD", "Research Analyst"}:
+                return "Researcher"
+            if profession in {"Unemployed"}:
+                return "Unemployed"
+            if profession in {"Student"}:
+                return "Student"
             return profession
 
-        dfs.train['Profession'] = dfs.train['Profession'].apply(lambda c: correct(c))
-        dfs.test['Profession'] = dfs.test['Profession'].apply(lambda c: correct(c))
+        dfs.train["Profession"] = dfs.train["Profession"].apply(lambda c: correct(c))
+        dfs.test["Profession"] = dfs.test["Profession"].apply(lambda c: correct(c))
         return dfs
 
     @log_method_call

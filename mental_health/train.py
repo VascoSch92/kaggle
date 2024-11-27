@@ -12,11 +12,11 @@ from sklearn.model_selection import StratifiedKFold, train_test_split
 from tools.task import Data, Task
 from tools.logger import log_method_call
 from tools.schema import Schema
+from mental_health.models.tabnet import train_tabnet
 from mental_health.models.catboost import train_catboost
 from mental_health.models.light_lgbm import train_lightlgbm
 from mental_health.models.xgboosting import train_xgboosting
 from mental_health.models.booster_ensemble import train_booster_ensemble
-from mental_health.models.tabnet import train_tabnet
 
 
 class MentalHealthTrain(Task):
