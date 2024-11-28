@@ -24,7 +24,8 @@ class MentalHealthTrain(Task):
 
     def __init__(self) -> None:
         super().__init__()
-        self.pipeline = os.environ.get("PIPELINE")
+        self.model = os.environ.get("MODEL")
+        self.stratification = os.environ.get("STRATIFICATION")
 
     def run_task(self) -> None:
         dfs = self._load_datasets()
@@ -38,7 +39,7 @@ class MentalHealthTrain(Task):
             random_state=self.config.random_state,
         )
 
-        model = self._training_model(
+        params = self.get_params(
             X_train=X_train,
             y_train=y_train,
             X_val=X_test,
@@ -49,7 +50,12 @@ class MentalHealthTrain(Task):
         # self._evaluate_model_on_val_set(X_test=X_test, y_test=y_val, model=model)
         # submission = self._create_submission_dataframe(dfs=dfs, model=model)
 
-        submission = self._create_submission_dataframe_with_stratification(X=X, y=y, dfs=dfs, model=model)
+        if self.stratification == "--stratification":
+            submission = self._create_submission_dataframe_with_stratification(X=X, y=y, dfs=dfs, model=model)
+        else:
+            self._evaluate_model_on_val_set(X_test=X_test, y_test=y_val, model=model)
+            submission = self._create_submission_dataframe(dfs=dfs, model=model)
+
         self._save_submission(submission=submission)
 
     @log_method_call
@@ -134,7 +140,7 @@ class MentalHealthTrain(Task):
                     logger=self.logger,
                 )
             case _:
-                raise KeyError
+                raise KeyError(f"Model {self.model} not found!")
 
     @log_method_call
     def _evaluate_model_on_val_set(
