@@ -304,7 +304,7 @@ class MentalHealthEtl(Task):
     @log_method_call
     def _ordinal_encoding(self, dfs: Data) -> Data:
         features = [f for f in dfs.schema.catvar_features() if dfs.schema.catvar[f] == EncodingType.ORDINAL_ENCODING]
-        ordinal_encoder = OrdinalEncoder(handle_unknown="use_encoded_value", unknown_value=-1, min_frequency=10)
+        ordinal_encoder = OrdinalEncoder(handle_unknown="use_encoded_value", unknown_value=-1, min_frequency=15)
         dfs.train[features] = ordinal_encoder.fit_transform(dfs.train[features])
         dfs.test[features] = ordinal_encoder.transform(dfs.test[features])
         return dfs
