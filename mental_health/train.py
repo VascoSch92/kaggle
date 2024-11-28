@@ -3,6 +3,7 @@ import uuid
 import pickle
 from typing import Any, Tuple
 from pathlib import Path
+from collections import namedtuple
 
 import numpy as np
 import pandas as pd
@@ -47,8 +48,7 @@ class MentalHealthTrain(Task):
             schema=dfs.schema,
         )
 
-        # self._evaluate_model_on_val_set(X_test=X_test, y_test=y_val, model=model)
-        # submission = self._create_submission_dataframe(dfs=dfs, model=model)
+        model = self._training_model(params=params)
 
         if self.stratification == "--stratification":
             submission = self._create_submission_dataframe_with_stratification(X=X, y=y, dfs=dfs, model=model)
@@ -80,65 +80,38 @@ class MentalHealthTrain(Task):
         return X, y
 
     @log_method_call
-    def _training_model(
+    def get_params(
         self,
-        X_train: pd.DataFrame,
-        y_train: pd.DataFrame,
-        X_val: pd.DataFrame,
-        y_val: pd.DataFrame,
-        schema: Schema,
-    ) -> Any:
-        match self.pipeline:
+        X_train: pd.DataFrame = None,
+        y_train: pd.DataFrame = None,
+        X_val: pd.DataFrame = None,
+        y_val: pd.DataFrame = None,
+        schema: Schema = None,
+    ) -> namedtuple:
+        Params = namedtuple("Params", ["X_train", "y_train", "X_val", "y_val", "schema", "config", "logger"])
+        return Params(
+            X_train=X_train,
+            y_train=y_train,
+            X_val=X_val,
+            y_val=y_val,
+            schema=schema,
+            config=self.config,
+            logger=self.logger,
+        )
+
+    @log_method_call
+    def _training_model(self, params: namedtuple) -> Any:
+        match self.model:
             case "--catboost":
-                return train_catboost(
-                    X_train=X_train,
-                    y_train=y_train,
-                    X_test=X_val,
-                    y_test=y_val,
-                    schema=schema,
-                    config=self.config,
-                    logger=self.logger,
-                )
+                return train_catboost(params=params)
             case "--light-lgbm":
-                return train_lightlgbm(
-                    X_train=X_train,
-                    y_train=y_train,
-                    X_test=X_val,
-                    y_test=y_val,
-                    schema=schema,
-                    config=self.config,
-                    logger=self.logger,
-                )
+                return train_lightlgbm(params=params)
             case "--xgboosting":
-                return train_xgboosting(
-                    X_train=X_train,
-                    y_train=y_train,
-                    X_test=X_val,
-                    y_test=y_val,
-                    schema=schema,
-                    config=self.config,
-                    logger=self.logger,
-                )
+                return train_xgboosting(params=params)
             case "--booster-ensemble":
-                return train_booster_ensemble(
-                    X_train=X_train,
-                    y_train=y_train,
-                    X_test=X_val,
-                    y_test=y_val,
-                    schema=schema,
-                    config=self.config,
-                    logger=self.logger,
-                )
+                return train_booster_ensemble(params=params)
             case "--tabnet":
-                return train_tabnet(
-                    X_train=X_train,
-                    y_train=y_train,
-                    X_test=X_val,
-                    y_test=y_val,
-                    schema=schema,
-                    config=self.config,
-                    logger=self.logger,
-                )
+                return train_tabnet(params=params)
             case _:
                 raise KeyError(f"Model {self.model} not found!")
 

@@ -1,23 +1,15 @@
 import warnings
+from collections import namedtuple
 
 import optuna
-import pandas as pd
 from lightgbm import LGBMClassifier
 from sklearn.model_selection import StratifiedKFold, cross_val_score
 
 warnings.filterwarnings("ignore")
 
 
-def train_lightlgbm(
-    X_train: pd.DataFrame,
-    y_train: pd.DataFrame,
-    X_test: pd.DataFrame,
-    y_test: pd.DataFrame,
-    schema,
-    config,
-    logger,
-) -> LGBMClassifier:
-    logger.info("Starting LGBM Training")
+def train_lightlgbm(params: namedtuple) -> LGBMClassifier:
+    params.logger.info("Starting LGBM Training")
 
     def objective(trial):
         param_grid = {
@@ -30,26 +22,26 @@ def train_lightlgbm(
             "min_child_samples": trial.suggest_int("min_child_samples", 5, 50),
             "lambda_l1": trial.suggest_loguniform("lambda_l1", 1e-8, 10.0),
             "lambda_l2": trial.suggest_loguniform("lambda_l2", 1e-8, 10.0),
-            "random_state": config.random_state,
+            "random_state": params.config.random_state,
             "verbose": -1,
         }
 
         cat_cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=1)
         model = LGBMClassifier(**param_grid)
 
-        model.fit(X_train, y_train)
-        scores = cross_val_score(model, X_train, y_train, cv=cat_cv, scoring="accuracy")
+        model.fit(params.X_train, params.y_train)
+        scores = cross_val_score(model, params.X_train, params.y_train, cv=cat_cv, scoring="accuracy")
 
         return scores.mean()
 
-    logger.info("Start study")
+    params.logger.info("Start study")
     study = optuna.create_study(direction="maximize")
     study.optimize(objective, n_trials=10)
 
     best_model = LGBMClassifier(**study.best_params)
-    best_model.fit(X_train, y_train)
+    best_model.fit(params.X_train, params.y_train)
 
-    logger.info(f"Best parameters found: {study.best_params}")
-    logger.info(f"Best model score: {study.best_value}")
+    params.logger.info(f"Best parameters found: {study.best_params}")
+    params.logger.info(f"Best model score: {study.best_value}")
 
     return best_model
