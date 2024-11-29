@@ -1,7 +1,8 @@
 import time
 import collections
 from abc import ABC, abstractmethod
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
+from pathlib import Path
 from dataclasses import dataclass
 
 import pandas as pd
@@ -17,7 +18,7 @@ class Task(ABC, LoggerSetup):
     def __init__(self) -> None:
         super().__init__()
         if self.config_path:
-            self.config = load_config(filepath=self.config_path)
+            self.config = load_config(filepath=Path(self.config_path))
 
     def run(self) -> None:
         self.logger.info(f"Starting task `{self.__class__.__name__}`")
@@ -39,7 +40,7 @@ class Data:
 
 
 class Pipeline(LoggerSetup):
-    def __init__(self, *args: Task) -> None:
+    def __init__(self, *args: Any) -> None:
         super().__init__()
         self.tasks = self._validate_tasks(args)
 

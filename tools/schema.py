@@ -1,5 +1,8 @@
+import pickle
 from enum import Enum
-from typing import Dict, List
+from typing import Dict, List, Union
+from logging import Logger
+from pathlib import Path
 from dataclasses import field, dataclass
 
 
@@ -15,6 +18,12 @@ class Schema:
 
     def catvar_features(self) -> List[str]:
         return list(self.catvar.keys())
+
+    def save_as_pickle(self, filepath: Union[Path, str], logger: Logger) -> None:
+        with Path(filepath).open("wb") as f:
+            pickle.dump(self, f)
+        logger.info(self.__repr__())
+        logger.info(f"Schema successfully saved at {filepath}!")
 
 
 class EncodingType(Enum):
