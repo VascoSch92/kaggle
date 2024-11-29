@@ -43,9 +43,22 @@ Where:
 
 ### Exploring Mental Health Data
 
+Playground Series - Season 4, Episode 11
+
 Page of the competition [here](https://www.kaggle.com/competitions/playground-series-s4e11)
 
-| Commit message                         | public score | private score |
+| Commit Message                         | Public Score | Private Score |
 |----------------------------------------|--------------|---------------|
 | `b9de241d(mental-health --light-lgbm)` | 0.94131      | TBC           |
 | `45dcb497(mental-health --light-lgbm)` | 0.94131      | TBC           |
+
+
+### Spaceship Titanic
+
+Predict which passengers are transported to an alternate dimension
+
+Page of the competition [here](https://www.kaggle.com/competitions/spaceship-titanic)
+
+| Commit Message                             | Score   | Ranking |
+|--------------------------------------------|---------|---------|
+| `130f8c4b(spaceship-titanic --light-lgbm)` | 0.80219 | top 15% |
