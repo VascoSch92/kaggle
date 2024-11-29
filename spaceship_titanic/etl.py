@@ -25,6 +25,7 @@ class SpaceshipTitanicEtl(Task):
         dfs = self._encoding(dfs=dfs)
         dfs = self._scaling(dfs=dfs)
 
+        dfs.train.Transported = dfs.train.Transported.astype(int)
         self._save_preprocessed_dataframe(dfs=dfs)
         dfs.schema.save_as_pickle(filepath=self.config.paths.schema, logger=self.logger)
 

@@ -29,7 +29,7 @@ class SpaceshipTitanicTrain(Task):
             test=load_from_csv(self.config.paths.test_preprocessed, logger=self.logger),
             schema=load_schema(self.config.paths.schema, logger=self.logger),
         )
-        self.logger.info(dfs.train.dtypes)
+
 
         X, y = self._select_features_and_labels(dfs=dfs)
         X_train, X_test, y_train, y_val = train_test_split(
@@ -138,9 +138,9 @@ class SpaceshipTitanicTrain(Task):
 
         submission = pd.DataFrame(
             {
-                "id": dfs.test.id,
-                "Depression": np.round(np.mean(test_predictions, axis=0) / 10),
+                "PassengerId": dfs.test.PassengerId,
+                "Transported": np.round(np.mean(test_predictions, axis=0) / 10),
             }
         )
-
+        submission["Transported"] = submission.Transported.astype(bool)
         return submission

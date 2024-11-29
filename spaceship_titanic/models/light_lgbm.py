@@ -27,7 +27,8 @@ def train_light_lgbm(params: namedtuple) -> LGBMClassifier:
             "num_threads": 1,  # Use a single thread,
         }
 
-        cat_cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=params.config.random_state)
+        cat_cv = StratifiedKFold(n_splits=3, shuffle=True, random_state=params.config.random_state)
+
         model = LGBMClassifier(**param_grid)
 
         model.fit(params.X_train, params.y_train)
@@ -37,7 +38,7 @@ def train_light_lgbm(params: namedtuple) -> LGBMClassifier:
 
     params.logger.info("Start study")
     study = optuna.create_study(direction="maximize")
-    study.optimize(objective, n_trials=15)
+    study.optimize(objective, n_trials=10)
 
     best_model = LGBMClassifier(**study.best_params)
     best_model.fit(params.X_train, params.y_train)
