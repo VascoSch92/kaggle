@@ -1,0 +1,9 @@
+random_state: 42
+
+paths:
+  data: "./spaceship_titanic/data"
+  schema: "./spaceship_titanic/data/schema.pkl"
+  train: "./spaceship_titanic/data/train.csv"
+  test: "./spaceship_titanic/data/test.csv"
+  train_preprocessed: "./spaceship_titanic/data/train_preprocessed.csv"
+  test_preprocessed: "./spaceship_titanic/data/test_preprocessed.csv"

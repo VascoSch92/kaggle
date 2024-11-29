@@ -6,6 +6,8 @@ from titanic.etl import TitanicEtl
 from titanic.train import TitanicTraining
 from mental_health.etl import MentalHealthEtl
 from mental_health.train import MentalHealthTrain
+from spaceship_titanic.etl import SpaceshipTitanicEtl
+from spaceship_titanic.train import SpaceshipTitanicTrain
 
 
 def main() -> None:
@@ -31,6 +33,12 @@ def main() -> None:
                     Pipeline(MentalHealthEtl).run()
                 case _:
                     Pipeline(MentalHealthEtl, MentalHealthTrain).run()
+        case "spaceship-titanic":
+            match model:
+                case "--preprocess":
+                    Pipeline(SpaceshipTitanicEtl).run()
+                case _:
+                    Pipeline(SpaceshipTitanicEtl, SpaceshipTitanicTrain).run()
         case _:
             execute_error_message(
                 message=f"Project {project} not present.",
