@@ -24,9 +24,10 @@ def train_light_lgbm(params: namedtuple) -> LGBMClassifier:
             "lambda_l2": trial.suggest_loguniform("lambda_l2", 1e-8, 10.0),
             "random_state": params.config.random_state,
             "verbose": -1,
+            "num_threads": 1,  # Use a single thread,
         }
 
-        cat_cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=1)
+        cat_cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=params.config.random_state)
         model = LGBMClassifier(**param_grid)
 
         model.fit(params.X_train, params.y_train)

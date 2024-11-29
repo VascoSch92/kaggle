@@ -2,8 +2,10 @@ import os
 from typing import Any, Tuple
 from collections import namedtuple
 
+import numpy as np
 import pandas as pd
-from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import StratifiedKFold, train_test_split
 
 from tools.load import load_schema, load_from_csv
 from tools.save import save_submission_as_csv
@@ -19,6 +21,7 @@ class SpaceshipTitanicTrain(Task):
     def __init__(self) -> None:
         super().__init__()
         self.model = os.environ.get("MODEL")
+        self.submission = os.environ.get("STRATIFICATION")
 
     def run_task(self) -> None:
         dfs = Data(
@@ -26,6 +29,7 @@ class SpaceshipTitanicTrain(Task):
             test=load_from_csv(self.config.paths.test_preprocessed, logger=self.logger),
             schema=load_schema(self.config.paths.schema, logger=self.logger),
         )
+        self.logger.info(dfs.train.dtypes)
 
         X, y = self._select_features_and_labels(dfs=dfs)
         X_train, X_test, y_train, y_val = train_test_split(
@@ -34,6 +38,7 @@ class SpaceshipTitanicTrain(Task):
             test_size=0.2,
             random_state=self.config.random_state,
         )
+
         params = self.get_params(
             X_train=X_train,
             y_train=y_train,
@@ -44,7 +49,7 @@ class SpaceshipTitanicTrain(Task):
 
         model = self._training_model(params=params)
 
-        submission = self._create_submission_dataframe(dfs=dfs, model=model)
+        submission = self._create_submission(X=X, y=y, dfs=dfs, model=model)
         save_submission_as_csv(
             path=self.config.paths.data,
             submission=submission,
@@ -86,8 +91,56 @@ class SpaceshipTitanicTrain(Task):
                 raise KeyError(f"Model {self.model} not found!")
 
     @log_method_call
+    def _create_submission(self, X: pd.DataFrame, y: pd.DataFrame, dfs: Data, model: Any) -> pd.DataFrame:
+        match self.submission:
+            case "--stratification":
+                return self._create_submission_dataframe_with_stratification(X=X, y=y, dfs=dfs, model=model)
+            case _:
+                return self._create_submission_dataframe(dfs=dfs, model=model)
+
+    @log_method_call
     def _create_submission_dataframe(self, dfs: Data, model: Any) -> pd.DataFrame:
         submission_pred = model.predict(dfs.test[dfs.schema.numeric_features() + dfs.schema.catvar_features()])
         submission = pd.DataFrame({"PassengerId": dfs.test.PassengerId, "Transported": submission_pred})
         submission["Transported"] = submission.Transported.astype(bool)
+        return submission
+
+    @log_method_call
+    def _create_submission_dataframe_with_stratification(
+        self,
+        X: pd.DataFrame,
+        y: pd.DataFrame,
+        dfs: Data,
+        model: Any,
+    ) -> pd.DataFrame:
+        stratified_k_fold = StratifiedKFold(10, shuffle=True, random_state=self.config.random_state)
+        splits = stratified_k_fold.split(X, y)
+
+        scores, test_predictions = [], []
+        for i, (full_train_idx, valid_idx) in enumerate(splits):
+            model_fold = model
+            X_train_fold, X_valid_fold = X.loc[full_train_idx], X.loc[valid_idx]
+            y_train_fold, y_valid_fold = y.loc[full_train_idx], y.loc[valid_idx]
+
+            model_fold.fit(X_train_fold, y_train_fold)
+
+            pred_valid_fold = model_fold.predict(X_valid_fold)
+
+            score = accuracy_score(y_valid_fold, pred_valid_fold)
+            scores.append(score)
+            test_df_pred = model_fold.predict_proba(
+                dfs.test[dfs.schema.numeric_features() + dfs.schema.catvar_features()]
+            )[:, 1]
+            test_predictions.append(test_df_pred)
+            self.logger.info(f"Fold {i + 1} Accuracy Score: {score}")
+
+        self.logger.info(f"mean Accuracy Score: {np.mean(scores):.4f}")
+
+        submission = pd.DataFrame(
+            {
+                "id": dfs.test.id,
+                "Depression": np.round(np.mean(test_predictions, axis=0) / 10),
+            }
+        )
+
         return submission

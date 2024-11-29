@@ -38,7 +38,6 @@ def load_from_csv(filepath: Union[Path, str], logger: Logger) -> pd.DataFrame:
 
 
 def load_schema(filepath: Union[Path, str], logger: Logger) -> Schema:
-    with Path(filepath).open("rb") as f:
-        schema = pickle.load(f)
     logger.info(f"Loaded schema from {filepath}")
-    return schema
+    with Path(filepath).open("rb") as f:
+        return pickle.load(f)

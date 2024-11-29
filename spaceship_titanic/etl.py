@@ -1,3 +1,5 @@
+from typing import List
+
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler, OrdinalEncoder, StandardScaler
 
 from tools.load import load_from_csv
@@ -16,6 +18,8 @@ class SpaceshipTitanicEtl(Task):
             schema=self._get_schema(),
         )
 
+        dfs = self._correct_columns(dfs=dfs)
+        dfs = self._fill_missing_values(dfs=dfs)
         dfs = self._features_engineering(dfs=dfs)
 
         dfs = self._encoding(dfs=dfs)
@@ -23,6 +27,64 @@ class SpaceshipTitanicEtl(Task):
 
         self._save_preprocessed_dataframe(dfs=dfs)
         dfs.schema.save_as_pickle(filepath=self.config.paths.schema, logger=self.logger)
+
+    @log_method_call
+    def _fill_missing_values(self, dfs: Data) -> Data:
+        dfs.train.HomePlanet.fillna(value="Unknown", inplace=True)
+        dfs.test.HomePlanet.fillna(value="Unknown", inplace=True)
+        dfs.train.Destination.fillna(value="Unknown", inplace=True)
+        dfs.test.Destination.fillna(value="Unknown", inplace=True)
+        dfs.train.VIP.fillna(value="Unknown", inplace=True)
+        dfs.train.VIP = dfs.train.VIP.astype(str)
+        dfs.test.VIP.fillna(value="Unknown", inplace=True)
+        dfs.test.VIP = dfs.test.VIP.astype(str)
+        return dfs
+
+    def _correct_columns(self, dfs: Data) -> Data:
+        dfs = self._correct_expense_columns(dfs=dfs)
+        dfs = self._fill_with_mean(dfs=dfs, columns=["Age", "RoomService", "FoodCourt", "ShoppingMall", "Spa", "VRDeck"])
+        dfs = self._correct_cryo_sleep_column(dfs=dfs)
+        return dfs
+
+    def _correct_cryo_sleep_column(self, dfs: Data) -> Data:
+        # If they bought something, then they were not in cryo sleep
+        # Select rows where CryoSleep is NaN
+        mask = dfs.train.CryoSleep.isna()
+
+        # Update those rows where any of the specified columns are 0
+        dfs.train.loc[mask, "CryoSleep"] = (
+            (dfs.train.loc[mask, "RoomService"] == 0)
+            & (dfs.train.loc[mask, "FoodCourt"] == 0)
+            & (dfs.train.loc[mask, "ShoppingMall"] == 0)
+            & (dfs.train.loc[mask, "Spa"] == 0)
+            & (dfs.train.loc[mask, "VRDeck"] == 0)
+        )
+
+        mask = dfs.test.CryoSleep.isna()
+        dfs.test.loc[mask, "CryoSleep"] = (
+            (dfs.test.loc[mask, "RoomService"] == 0)
+            & (dfs.test.loc[mask, "FoodCourt"] == 0)
+            & (dfs.test.loc[mask, "ShoppingMall"] == 0)
+            & (dfs.test.loc[mask, "Spa"] == 0)
+            & (dfs.test.loc[mask, "VRDeck"] == 0)
+        )
+
+        return dfs
+
+    @log_method_call
+    def _correct_expense_columns(self, dfs: Data) -> Data:
+        # Fill with 0 because if they are in cryo sleep, then they cannot buy stuff.
+        expense_columns = ["RoomService", "FoodCourt", "ShoppingMall", "Spa", "VRDeck"]
+        dfs.train[dfs.train.CryoSleep == True][expense_columns].fillna(value="Unknown", inplace=True)
+        dfs.test[dfs.test.CryoSleep == True][expense_columns].fillna(value="Unknown", inplace=True)
+        return dfs
+
+    @log_method_call
+    def _fill_with_mean(self, dfs: Data, columns: List[str]) -> Data:
+        mean = dfs.train[columns].mean().to_dict()
+        dfs.train[columns] = dfs.train[columns].fillna(mean)
+        dfs.test[columns] = dfs.test[columns].fillna(mean)
+        return dfs
 
     @log_method_call
     def _get_schema(self) -> Schema:
@@ -34,7 +96,7 @@ class SpaceshipTitanicEtl(Task):
                 "FoodCourt": ScalerType.STANDARD_SCALER,
                 "ShoppingMall": ScalerType.STANDARD_SCALER,
                 "Spa": ScalerType.STANDARD_SCALER,
-                "VRDeck": ScalerType.MINMAX_SCALER,
+                "VRDeck": ScalerType.STANDARD_SCALER,
             },
             catvar={
                 "HomePlanet": EncodingType.LABEL_ENCODING,
@@ -50,6 +112,7 @@ class SpaceshipTitanicEtl(Task):
     def _features_engineering(self, dfs: Data) -> Data:
         dfs = self._extract_cabin_data(dfs=dfs)
         dfs = self._extract_group_data(dfs=dfs)
+        dfs = self._extract_amount_billed(dfs=dfs)
         return dfs
 
     @log_method_call
@@ -60,10 +123,20 @@ class SpaceshipTitanicEtl(Task):
         dfs.test[["Deck", "Number", "Side"]] = dfs.test["Cabin"].str.split("/", expand=True)
         dfs.test.drop(columns=["Cabin"], inplace=True)
 
+        dfs = self._fill_with_mode(dfs=dfs, columns=["Deck", "Number", "Side"])
+
         dfs.schema.catvar.update(
             {"Deck": EncodingType.LABEL_ENCODING, "Number": None, "Side": EncodingType.LABEL_ENCODING}
         )
         del dfs.schema.catvar["Cabin"]
+        return dfs
+
+    @log_method_call
+    def _fill_with_mode(self, dfs: Data, columns: List[str]) -> Data:
+        for column in columns:
+            mode = dfs.train[column].mode()[0]
+            dfs.train[column] = dfs.train[column].fillna(mode)
+            dfs.test[column] = dfs.test[column].fillna(mode)
         return dfs
 
     @log_method_call
