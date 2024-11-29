@@ -30,7 +30,6 @@ class SpaceshipTitanicTrain(Task):
             schema=load_schema(self.config.paths.schema, logger=self.logger),
         )
 
-
         X, y = self._select_features_and_labels(dfs=dfs)
         X_train, X_test, y_train, y_val = train_test_split(
             X,
