@@ -40,7 +40,7 @@ class MentalHealthEtl(Task):
     @log_method_call
     def _create_schema(self) -> Schema:
         return Schema(
-            meta=["id", "Name"],
+            meta=["id"],
             numeric={
                 "Age": ScalerType.MINMAX_SCALER,
                 "Academic Pressure": None,
@@ -52,6 +52,7 @@ class MentalHealthEtl(Task):
                 "Financial Stress": None,
             },
             catvar={
+                "Name": EncodingType.ORDINAL_ENCODING,
                 "Gender": EncodingType.LABEL_ENCODING,
                 "City": EncodingType.ORDINAL_ENCODING,
                 "Working Professional or Student": EncodingType.LABEL_ENCODING,
