@@ -28,6 +28,7 @@ def train_light_lgbm(params: namedtuple) -> LGBMClassifier:
             "num_threads": 1,  # Use a single thread,
         }
 
+
         cat_cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=params.config.random_state)
 
         model = LGBMClassifier(**param_grid)
