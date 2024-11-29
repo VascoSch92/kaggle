@@ -139,7 +139,7 @@ class SpaceshipTitanicTrain(Task):
         submission = pd.DataFrame(
             {
                 "PassengerId": dfs.test.PassengerId,
-                "Transported": np.round(np.mean(test_predictions, axis=0) / 10),
+                "Transported": np.round(np.mean(test_predictions, axis=0)),
             }
         )
         submission["Transported"] = submission.Transported.astype(bool)
