@@ -3,6 +3,7 @@ from collections import namedtuple
 
 import optuna
 from lightgbm import LGBMClassifier
+from sklearn.metrics import accuracy_score
 from sklearn.model_selection import StratifiedKFold, cross_val_score
 
 warnings.filterwarnings("ignore")
@@ -27,7 +28,7 @@ def train_light_lgbm(params: namedtuple) -> LGBMClassifier:
             "num_threads": 1,  # Use a single thread,
         }
 
-        cat_cv = StratifiedKFold(n_splits=3, shuffle=True, random_state=params.config.random_state)
+        cat_cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=params.config.random_state)
 
         model = LGBMClassifier(**param_grid)
 
