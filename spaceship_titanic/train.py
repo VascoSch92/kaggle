@@ -4,7 +4,7 @@ from collections import namedtuple
 
 import numpy as np
 import pandas as pd
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, classification_report
 from sklearn.model_selection import StratifiedKFold, train_test_split
 
 from tools.load import load_schema, load_from_csv
@@ -48,7 +48,7 @@ class SpaceshipTitanicTrain(Task):
 
         model = self._training_model(params=params)
 
-        submission = self._create_submission(X=X, y=y, dfs=dfs, model=model)
+        submission = self._create_submission(X=X, y=y, dfs=dfs, model=model, params=params)
         save_submission_as_csv(
             path=self.config.paths.data,
             submission=submission,
@@ -90,12 +90,28 @@ class SpaceshipTitanicTrain(Task):
                 raise KeyError(f"Model {self.model} not found!")
 
     @log_method_call
-    def _create_submission(self, X: pd.DataFrame, y: pd.DataFrame, dfs: Data, model: Any) -> pd.DataFrame:
+    def _create_submission(
+        self, X: pd.DataFrame, y: pd.DataFrame, dfs: Data, model: Any, params: "Params"
+    ) -> pd.DataFrame:
         match self.submission:
             case "--stratification":
                 return self._create_submission_dataframe_with_stratification(X=X, y=y, dfs=dfs, model=model)
             case _:
+                self._evaluate_model_on_val_set(X_val=params.X_val, y_val=params.y_val, model=model)
                 return self._create_submission_dataframe(dfs=dfs, model=model)
+
+    @log_method_call
+    def _evaluate_model_on_val_set(
+        self,
+        X_val: pd.DataFrame,
+        y_val: pd.DataFrame,
+        model: Any,
+    ) -> None:
+        y_pred = model.predict(X_val)
+        accuracy = accuracy_score(y_val, y_pred=y_pred)
+        self.logger.info(f"Accuracy on validation set: {accuracy:.4f}")
+        report = classification_report(y_true=y_val, y_pred=y_pred)
+        self.logger.info(f"Classification report \n {report}")
 
     @log_method_call
     def _create_submission_dataframe(self, dfs: Data, model: Any) -> pd.DataFrame:

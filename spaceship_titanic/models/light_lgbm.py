@@ -36,17 +36,16 @@ def train_light_lgbm(params: namedtuple) -> LGBMClassifier:
             params.y_train,
             eval_set=[(params.X_val, params.y_val)],
             eval_names=["validation"],
-            eval_metric="average_precision",
+            eval_metric="binary_error",
         )
 
         scores = cross_val_score(model, params.X_train, params.y_train, cv=cat_cv, scoring="accuracy")
 
-        return (scores.mean() + model.evals_result_["validation"]["average_precision"][-1]) / 2
+        return (scores.mean() + 1 - model.evals_result_["validation"]["binary_error"][-1]) / 2
 
     params.logger.info("Start study")
     study = optuna.create_study(direction="maximize")
     study.optimize(objective, n_trials=10)
-
 
     best_model = LGBMClassifier(**study.best_params)
     best_model.fit(
@@ -54,11 +53,11 @@ def train_light_lgbm(params: namedtuple) -> LGBMClassifier:
         params.y_train,
         eval_set=[(params.X_val, params.y_val)],
         eval_names=["validation"],
-        eval_metric="average_precision",
+        eval_metric="binary_error",
     )
 
     params.logger.info(f"Best parameters found: {study.best_params}")
     params.logger.info(f"Best model score: {study.best_value}")
-    params.logger.info(f"Best validation score: {best_model.evals_result_['validation']['average_precision'][-1]}")
+    params.logger.info(f"Best validation score: {best_model.evals_result_['validation']['binary_error'][-1]}")
 
     return best_model
