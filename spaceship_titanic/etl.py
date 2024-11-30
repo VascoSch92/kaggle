@@ -197,6 +197,7 @@ class SpaceshipTitanicEtl(Task):
     def _label_encoder(self, dfs: Data) -> Data:
         features = [f for f in dfs.schema.catvar_features() if dfs.schema.catvar[f] == EncodingType.LABEL_ENCODING]
         if features:
+            self.logger.info(f"Label encoding features: {features}")
             label_encoder = LabelEncoder()
             for feature in features:
                 dfs.train[feature] = label_encoder.fit_transform(dfs.train[feature])
@@ -207,6 +208,7 @@ class SpaceshipTitanicEtl(Task):
     def _ordinal_encoding(self, dfs: Data) -> Data:
         features = [f for f in dfs.schema.catvar_features() if dfs.schema.catvar[f] == EncodingType.ORDINAL_ENCODING]
         if features:
+            self.logger.info(f"Ordinal encoding features: {features}")
             ordinal_encoder = OrdinalEncoder(handle_unknown="use_encoded_value", unknown_value=-1, min_frequency=15)
             dfs.train[features] = ordinal_encoder.fit_transform(dfs.train[features])
             dfs.test[features] = ordinal_encoder.transform(dfs.test[features])
@@ -222,6 +224,7 @@ class SpaceshipTitanicEtl(Task):
     def _min_max_scaling(self, dfs: Data) -> Data:
         features = [f for f in dfs.schema.numeric_features() if dfs.schema.numeric[f] == ScalerType.MINMAX_SCALER]
         if features:
+            self.logger.info(f"Min max scaling features: {features}")
             scaler = MinMaxScaler()
             dfs.train[features] = scaler.fit_transform(dfs.train[features])
             dfs.test[features] = scaler.transform(dfs.test[features])
@@ -231,6 +234,7 @@ class SpaceshipTitanicEtl(Task):
     def _standard_scaling(self, dfs: Data) -> Data:
         features = [f for f in dfs.schema.numeric_features() if dfs.schema.numeric[f] == ScalerType.STANDARD_SCALER]
         if features:
+            self.logger.info(f"Standard scaling features: {features}")
             scaler = StandardScaler()
             dfs.train[features] = scaler.fit_transform(dfs.train[features])
             dfs.test[features] = scaler.transform(dfs.test[features])
