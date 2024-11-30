@@ -41,7 +41,7 @@ def train_light_lgbm(params: namedtuple) -> LGBMClassifier:
 
         scores = cross_val_score(model, params.X_train, params.y_train, cv=cat_cv, scoring="accuracy")
 
-        return (scores.mean() + 1 - model.evals_result_["validation"]["binary_error"][-1]) / 2
+        return scores.mean()
 
     params.logger.info("Start study")
     study = optuna.create_study(direction="maximize")
