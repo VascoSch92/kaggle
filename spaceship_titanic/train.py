@@ -108,8 +108,10 @@ class SpaceshipTitanicTrain(Task):
         model: Any,
     ) -> None:
         y_pred = model.predict(X_val)
+
         accuracy = accuracy_score(y_val, y_pred=y_pred)
         self.logger.info(f"Accuracy on validation set: {accuracy:.4f}")
+
         report = classification_report(y_true=y_val, y_pred=y_pred)
         self.logger.info(f"Classification report \n {report}")
 
