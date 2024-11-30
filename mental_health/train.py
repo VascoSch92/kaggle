@@ -153,9 +153,7 @@ class MentalHealthTrain(Task):
 
             score = accuracy_score(y_valid_fold, pred_valid_fold)
             scores.append(score)
-            test_df_pred = model_fold.predict_proba(
-                dfs.test[dfs.schema.numeric_features() + dfs.schema.catvar_features()]
-            )[:, 1]
+            test_df_pred = model_fold.predict(dfs.test[dfs.schema.numeric_features() + dfs.schema.catvar_features()])
             test_predictions.append(test_df_pred)
             self.logger.info(f"Fold {i + 1} Accuracy Score: {score}")
 

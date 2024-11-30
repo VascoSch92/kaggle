@@ -19,7 +19,6 @@ def train_xgboosting(params: namedtuple) -> XGBClassifier:
     scale_pos_weight = (negative_count / positive_count).values[0]
 
     def objective(trial):
-        # Define hyperparameter search space
         param = {
             "objective": "binary:logistic",
             "eval_metric": "logloss",

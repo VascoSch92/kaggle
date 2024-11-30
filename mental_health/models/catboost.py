@@ -24,6 +24,7 @@ def train_catboost(params: namedtuple) -> CatBoostClassifier:
             "bagging_temperature": trial.suggest_loguniform("bagging_temperature", 0.1, 10.0),
             "cat_features": params.schema.catvar_features(),  # Specify categorical features if any
             "random_seed": params.config.random_state,
+            "eval_metric": "Accuracy",
             "verbose": False,
         }
 
@@ -33,18 +34,25 @@ def train_catboost(params: namedtuple) -> CatBoostClassifier:
         model = CatBoostClassifier(**param)
 
         # Fit the model
-        model.fit(params.X_train, params.y_train, eval_set)
+        model.fit(
+            params.X_train,
+            params.y_train,
+            eval_set=[(params.X_val, params.y_val)],
+        )
         scores = cross_val_score(model, params.X_train, params.y_train, cv=cat_cv, scoring="accuracy")
-        return scores.mean()
+        val_score = model.score(params.X_val, params.y_val)
+
+        return (scores.mean() + val_score) / 2
 
     params.logger.info("Starting study")
     study = optuna.create_study(direction="maximize")
-    study.optimize(objective, n_trials=1)
+    study.optimize(objective, n_trials=10)
 
     best_model = CatBoostClassifier(**study.best_params, verbose=False)
     best_model.fit(params.X_train, params.y_train)
 
     params.logger.info(f"Best model parameters {study.best_params}")
     params.logger.info(f"Best model score: {study.best_value}")
+    params.logger.info(f"Validation score: {best_model.score(params.X_val, params.y_val)}")
 
     return best_model
