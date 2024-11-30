@@ -3,7 +3,7 @@ from collections import namedtuple
 
 import optuna
 from xgboost import XGBClassifier
-from sklearn.metrics import accuracy_score
+from sklearn.model_selection import StratifiedKFold, cross_val_score
 
 warnings.filterwarnings("ignore")
 
@@ -42,11 +42,11 @@ def train_xgboosting(params: namedtuple) -> XGBClassifier:
         model.fit(params.X_train, params.y_train, eval_set=[(params.X_val, params.y_val)], verbose=False)
 
         # Predict and evaluate
-        preds = model.predict(params.X_val)
-        accuracy = accuracy_score(params.y_val, preds)
+        cat_cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=params.config.random_state)
+        scores = cross_val_score(model, params.X_train, params.y_train, cv=cat_cv, scoring="accuracy")
 
         # Return the negative accuracy as Optuna minimizes the objective by default
-        return -accuracy
+        return scores.mean()
 
     # Create an Optuna study to maximize the accuracy
     params.logger.info("Starting study")
