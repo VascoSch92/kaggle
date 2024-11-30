@@ -163,7 +163,7 @@ class SpaceshipTitanicEtl(Task):
     def _extract_expense_data(self, dfs: Data) -> Data:
         dfs.train["EssentialExpense"] = dfs.train.FoodCourt + dfs.train.ShoppingMall
         dfs.test["EssentialExpense"] = dfs.test.FoodCourt + dfs.test.ShoppingMall
-        dfs.schema.catvar.update({"EssentialExpense": ScalerType.STANDARD_SCALER})
+        dfs.schema.numeric.update({"EssentialExpense": ScalerType.STANDARD_SCALER})
 
         dfs.train["NoEssentialExpense"] = dfs.train["EssentialExpense"] == 0
         dfs.test["NoEssentialExpense"] = dfs.test["EssentialExpense"] == 0
@@ -171,7 +171,7 @@ class SpaceshipTitanicEtl(Task):
 
         dfs.train["LuxuryExpense"] = dfs.train.RoomService + dfs.train.Spa + dfs.train.VRDeck
         dfs.test["LuxuryExpense"] = dfs.test.RoomService + dfs.test.Spa + dfs.test.VRDeck
-        dfs.schema.catvar.update({"LuxuryExpense": ScalerType.STANDARD_SCALER})
+        dfs.schema.numeric.update({"LuxuryExpense": ScalerType.STANDARD_SCALER})
 
         dfs.train["NoLuxuryExpense"] = dfs.train["LuxuryExpense"] == 0
         dfs.test["NoLuxuryExpense"] = dfs.test["LuxuryExpense"] == 0
