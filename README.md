@@ -59,8 +59,8 @@ Predict which passengers are transported to an alternate dimension
 
 Page of the competition [here](https://www.kaggle.com/competitions/spaceship-titanic)
 
-| Commit Message                             | Score    | Ranking |
-|--------------------------------------------|----------|---------|
-| `a16b9e5f(spaceship-titanic --light-lgbm)` | 0.80336  | top 15% |
-| `53febd60(mental-health --light-lgbm)`     | 0.80289  | top 16% |
-| `130f8c4b(spaceship-titanic --light-lgbm)` | 0.80219  | top 16% |
+| Commit Message                             | Score   | Ranking |
+|--------------------------------------------|---------|---------|
+| `a16b9e5f(spaceship-titanic --light-lgbm)` | 0.80336 | top 15% |
+| `53febd60(mental-health --light-lgbm)`     | 0.80289 | top 16% |
+| `c97217de(spaceship-titanic --light-lgbm)` | 0.80243 | top 16% |
