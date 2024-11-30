@@ -184,7 +184,6 @@ class SpaceshipTitanicEtl(Task):
             dfs.test.RoomService + dfs.test.FoodCourt + dfs.test.ShoppingMall + dfs.test.Spa + dfs.test.VRDeck
         )
         dfs.schema.numeric.update({"TotalAmountBilled": ScalerType.STANDARD_SCALER})
-
         return dfs
 
     @log_method_call
