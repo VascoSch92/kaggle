@@ -1,4 +1,4 @@
-from collections import namedtuple
+"""from collections import namedtuple
 
 import torch
 from sklearn.metrics import accuracy_score
@@ -6,7 +6,7 @@ from pytorch_tabnet.tab_model import TabNetClassifier
 
 
 def train_tabnet(params: namedtuple):
-    """
+
     def objective(trial):
         # Hyperparameters to tune
         n_d = trial.suggest_int("n_d", 8, 64)  # Dimension of decision layer
@@ -71,7 +71,7 @@ def train_tabnet(params: namedtuple):
         momentum=best_params["momentum"],
         verbose=1
     )
-    """
+
     cat_idxs = [params.X_train.columns.get_loc(col) for col in params.schema.catvar_features()]
     cat_dims = [len(params.X_train[col].unique()) for col in params.schema.catvar_features()]
     seed = params.config.random_state
@@ -119,3 +119,4 @@ def train_tabnet(params: namedtuple):
     final_acc = accuracy_score(params.y_val.values, final_preds)
     params.logger.info(f"Final Accuracy: {final_acc}")
     return model
+"""

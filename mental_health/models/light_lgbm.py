@@ -2,7 +2,6 @@ import warnings
 from collections import namedtuple
 
 import optuna
-import pandas as pd
 from lightgbm import LGBMClassifier
 from sklearn.model_selection import StratifiedKFold, cross_val_score
 
@@ -10,10 +9,7 @@ warnings.filterwarnings("ignore")
 
 
 def train_lightlgbm(params: namedtuple) -> LGBMClassifier:
-    params.logger.info("Starting LGBM Training")
-
-    X = pd.concat([params.X_train, params.X_val], axis=0)
-    y = pd.concat([params.y_train, params.y_val], axis=0)
+    params.logger.info("Starting LGBMClassifier Training")
 
     def objective(trial):
         param_grid = {
@@ -33,19 +29,33 @@ def train_lightlgbm(params: namedtuple) -> LGBMClassifier:
         cat_cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=1)
         model = LGBMClassifier(**param_grid)
 
-        model.fit(X, y)
-        scores = cross_val_score(model, X, y, cv=cat_cv, scoring="accuracy")
+        model.fit(
+            params.X_train,
+            params.y_train,
+            eval_set=[(params.X_val, params.y_val)],
+            eval_names=["validation"],
+            eval_metric="average_precision",
+        )
 
-        return scores.mean()
+        scores = cross_val_score(model, params.X_train, params.y_train, cv=cat_cv, scoring="accuracy")
+
+        return (scores.mean() + model.evals_result_["validation"]["average_precision"][-1]) / 2
 
     params.logger.info("Start study")
     study = optuna.create_study(direction="maximize")
     study.optimize(objective, n_trials=15)
 
     best_model = LGBMClassifier(**study.best_params)
-    best_model.fit(X, y)
+    best_model.fit(
+        params.X_train,
+        params.y_train,
+        eval_set=[(params.X_val, params.y_val)],
+        eval_names=["validation"],
+        eval_metric="average_precision",
+    )
 
     params.logger.info(f"Best parameters found: {study.best_params}")
     params.logger.info(f"Best model score: {study.best_value}")
+    params.logger.info(f"Best validation score: {best_model.evals_result_['validation']['average_precision'][-1]}")
 
     return best_model

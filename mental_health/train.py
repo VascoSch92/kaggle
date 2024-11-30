@@ -13,7 +13,6 @@ from sklearn.model_selection import StratifiedKFold, train_test_split
 from tools.task import Data, Task
 from tools.logger import log_method_call
 from tools.schema import Schema
-from mental_health.models.tabnet import train_tabnet
 from mental_health.models.catboost import train_catboost
 from mental_health.models.light_lgbm import train_lightlgbm
 from mental_health.models.xgboosting import train_xgboosting
@@ -110,8 +109,6 @@ class MentalHealthTrain(Task):
                 return train_xgboosting(params=params)
             case "--booster-ensemble":
                 return train_booster_ensemble(params=params)
-            case "--tabnet":
-                return train_tabnet(params=params)
             case _:
                 raise KeyError(f"Model {self.model} not found!")
 
@@ -167,7 +164,7 @@ class MentalHealthTrain(Task):
         submission = pd.DataFrame(
             {
                 "id": dfs.test.id,
-                "Depression": np.round(np.mean(test_predictions, axis=0) / 10),
+                "Depression": np.round(np.mean(test_predictions, axis=0)),
             }
         )
 

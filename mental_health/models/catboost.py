@@ -33,13 +33,13 @@ def train_catboost(params: namedtuple) -> CatBoostClassifier:
         model = CatBoostClassifier(**param)
 
         # Fit the model
-        model.fit(params.X_train, params.y_train)
+        model.fit(params.X_train, params.y_train, eval_set)
         scores = cross_val_score(model, params.X_train, params.y_train, cv=cat_cv, scoring="accuracy")
         return scores.mean()
 
     params.logger.info("Starting study")
     study = optuna.create_study(direction="maximize")
-    study.optimize(objective, n_trials=10)
+    study.optimize(objective, n_trials=1)
 
     best_model = CatBoostClassifier(**study.best_params, verbose=False)
     best_model.fit(params.X_train, params.y_train)
