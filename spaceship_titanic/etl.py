@@ -40,12 +40,14 @@ class SpaceshipTitanicEtl(Task):
         dfs.test.VIP = dfs.test.VIP.astype(str)
         return dfs
 
+    @log_method_call
     def _correct_columns(self, dfs: Data) -> Data:
         dfs = self._correct_expense_columns(dfs=dfs)
         dfs = self._fill_with_mean(dfs=dfs, columns=["Age", "RoomService", "FoodCourt", "ShoppingMall", "Spa", "VRDeck"])
         dfs = self._correct_cryo_sleep_column(dfs=dfs)
         return dfs
 
+    @log_method_call
     def _correct_cryo_sleep_column(self, dfs: Data) -> Data:
         # If they bought something, then they were not in cryo sleep
         # Select rows where CryoSleep is NaN
@@ -112,7 +114,7 @@ class SpaceshipTitanicEtl(Task):
     def _features_engineering(self, dfs: Data) -> Data:
         dfs = self._extract_cabin_data(dfs=dfs)
         dfs = self._extract_group_data(dfs=dfs)
-        dfs = self._extract_amount_billed(dfs=dfs)
+        dfs = self._extract_expense_data(dfs=dfs)
         return dfs
 
     @log_method_call
@@ -158,7 +160,23 @@ class SpaceshipTitanicEtl(Task):
         return dfs
 
     @log_method_call
-    def _extract_amount_billed(self, dfs: Data) -> Data:
+    def _extract_expense_data(self, dfs: Data) -> Data:
+        dfs.train["EssentialExpense"] = dfs.train.FoodCourt + dfs.train.ShoppingMall
+        dfs.test["EssentialExpense"] = dfs.test.FoodCourt + dfs.test.ShoppingMall
+        dfs.schema.catvar.update({"EssentialExpense": ScalerType.STANDARD_SCALER})
+
+        dfs.train["NoEssentialExpense"] = dfs.train["EssentialExpense"] == 0
+        dfs.test["NoEssentialExpense"] = dfs.test["EssentialExpense"] == 0
+        dfs.schema.catvar.update({"NoEssentialExpense": EncodingType.LABEL_ENCODING})
+
+        dfs.train["LuxuryExpense"] = dfs.train.RoomService + dfs.train.Spa + dfs.train.VRDeck
+        dfs.test["LuxuryExpense"] = dfs.test.RoomService + dfs.test.Spa + dfs.test.VRDeck
+        dfs.schema.catvar.update({"LuxuryExpense": ScalerType.STANDARD_SCALER})
+
+        dfs.train["NoLuxuryExpense"] = dfs.train["LuxuryExpense"] == 0
+        dfs.test["NoLuxuryExpense"] = dfs.test["LuxuryExpense"] == 0
+        dfs.schema.catvar.update({"NoLuxuryExpense": EncodingType.LABEL_ENCODING})
+
         dfs.train["TotalAmountBilled"] = (
             dfs.train.RoomService + dfs.train.FoodCourt + dfs.train.ShoppingMall + dfs.train.Spa + dfs.train.VRDeck
         )
@@ -166,6 +184,7 @@ class SpaceshipTitanicEtl(Task):
             dfs.test.RoomService + dfs.test.FoodCourt + dfs.test.ShoppingMall + dfs.test.Spa + dfs.test.VRDeck
         )
         dfs.schema.numeric.update({"TotalAmountBilled": ScalerType.STANDARD_SCALER})
+
         return dfs
 
     @log_method_call
