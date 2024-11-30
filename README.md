@@ -47,10 +47,11 @@ Playground Series - Season 4, Episode 11
 
 Page of the competition [here](https://www.kaggle.com/competitions/playground-series-s4e11)
 
-| Commit Message                         | Public Score | Private Score |
-|----------------------------------------|--------------|---------------|
-| `b9de241d(mental-health --light-lgbm)` | 0.94131      | TBC           |
-| `45dcb497(mental-health --light-lgbm)` | 0.94131      | TBC           |
+| Commit Message                                                | Public Score | Private Score |
+|---------------------------------------------------------------|--------------|---------------|
+| `1e64c2da(mental-health --booster-ensemble --stratification)` | 0.94168      | TBC           |
+| `b9de241d(mental-health --light-lgbm)`                        | 0.94131      | TBC           |
+| `45dcb497(mental-health --light-lgbm)`                        | 0.94131      | TBC           |
 
 
 ### Spaceship Titanic
