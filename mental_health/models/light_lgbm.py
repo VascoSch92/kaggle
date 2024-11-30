@@ -27,8 +27,8 @@ def train_lightlgbm(params: namedtuple) -> LGBMClassifier:
         }
 
         cat_cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=1)
-        model = LGBMClassifier(**param_grid)
 
+        model = LGBMClassifier(**param_grid)
         model.fit(
             params.X_train,
             params.y_train,
