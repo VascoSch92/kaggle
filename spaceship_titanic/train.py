@@ -170,4 +170,5 @@ class SpaceshipTitanicTrain(Task):
             }
         )
         submission["Transported"] = submission.Transported.astype(bool)
+
         return submission
