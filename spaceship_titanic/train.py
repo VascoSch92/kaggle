@@ -16,6 +16,7 @@ from spaceship_titanic.models.catboost import train_catboost
 from spaceship_titanic.models.light_lgbm import train_light_lgbm
 from spaceship_titanic.models.xgboosting import train_xgboosting
 from spaceship_titanic.models.booster_ensemble import train_booster_ensemble
+from spaceship_titanic.models.booster_stacking import train_booster_stacking
 
 
 class SpaceshipTitanicTrain(Task):
@@ -95,6 +96,8 @@ class SpaceshipTitanicTrain(Task):
                 return train_xgboosting(params=params)
             case "--booster-ensemble":
                 return train_booster_ensemble(params=params)
+            case "--booster-stacking":
+                return train_booster_stacking(params=params)
             case _:
                 raise KeyError(f"Model {self.model} not found!")
 
