@@ -45,23 +45,25 @@ Where:
 
 Playground Series - Season 4, Episode 11
 
-Page of the competition [here](https://www.kaggle.com/competitions/playground-series-s4e11)
+**Page of the competition:** [link](https://www.kaggle.com/competitions/playground-series-s4e11)
+
+**Ranked:** 438/2685 (top 17%)
 
 | Commit Message                                                | Public Score | Private Score |
 |---------------------------------------------------------------|--------------|---------------|
-| `1e64c2da(mental-health --booster-ensemble --stratification)` | 0.94168      | TBC           |
-| `b9de241d(mental-health --light-lgbm)`                        | 0.94131      | TBC           |
-| `45dcb497(mental-health --light-lgbm)`                        | 0.94131      | TBC           |
+| `1e64c2da(mental-health --booster-ensemble --stratification)` | 0.94168      | 0.94071       |
+| `b9de241d(mental-health --light-lgbm)`                        | 0.94131      | 0.94011       |
+
 
 
 ### Spaceship Titanic
 
 Predict which passengers are transported to an alternate dimension
 
-Page of the competition [here](https://www.kaggle.com/competitions/spaceship-titanic)
+**Page of the competition:** [link](https://www.kaggle.com/competitions/spaceship-titanic)
 
 | Commit Message                             | Score   | Ranking |
 |--------------------------------------------|---------|---------|
 | `a16b9e5f(spaceship-titanic --light-lgbm)` | 0.80336 | top 15% |
 | `53febd60(mental-health --light-lgbm)`     | 0.80289 | top 16% |
-| `c97217de(spaceship-titanic --light-lgbm)` | 0.80243 | top 16% |
+
