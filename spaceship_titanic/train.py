@@ -12,6 +12,7 @@ from tools.save import save_submission_as_csv
 from tools.task import Data, Task
 from tools.logger import log_method_call
 from tools.schema import Schema
+from spaceship_titanic.models.catboost import train_catboost
 from spaceship_titanic.models.light_lgbm import train_light_lgbm
 
 
@@ -86,6 +87,8 @@ class SpaceshipTitanicTrain(Task):
         match self.model:
             case "--light-lgbm":
                 return train_light_lgbm(params=params)
+            case "--catboost":
+                return train_catboost(params=params)
             case _:
                 raise KeyError(f"Model {self.model} not found!")
 
