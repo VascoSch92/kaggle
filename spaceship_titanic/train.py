@@ -17,6 +17,7 @@ from spaceship_titanic.models.light_lgbm import train_light_lgbm
 from spaceship_titanic.models.xgboosting import train_xgboosting
 from spaceship_titanic.models.booster_ensemble import train_booster_ensemble
 
+
 class SpaceshipTitanicTrain(Task):
     config_path = "./spaceship_titanic/config.yml"
 
@@ -153,9 +154,7 @@ class SpaceshipTitanicTrain(Task):
 
             score = accuracy_score(y_valid_fold, pred_valid_fold)
             scores.append(score)
-            test_df_pred = model_fold.predict_proba(
-                dfs.test[dfs.schema.numeric_features() + dfs.schema.catvar_features()]
-            )[:, 1]
+            test_df_pred = model_fold.predict(dfs.test[dfs.schema.numeric_features() + dfs.schema.catvar_features()])
             test_predictions.append(test_df_pred)
             self.logger.info(f"Fold {i + 1} Accuracy Score: {score}")
 
