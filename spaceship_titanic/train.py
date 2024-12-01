@@ -1,19 +1,20 @@
 import os
-from collections import namedtuple
 from typing import Any, Tuple
+from collections import namedtuple
 
 import numpy as np
 import pandas as pd
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.model_selection import StratifiedKFold, train_test_split
 
+from tools.load import load_schema, load_from_csv
+from tools.save import save_submission_as_csv
+from tools.task import Data, Task
+from tools.logger import log_method_call
+from tools.schema import Schema
 from spaceship_titanic.models.catboost import train_catboost
 from spaceship_titanic.models.light_lgbm import train_light_lgbm
-from tools.load import load_schema, load_from_csv
-from tools.logger import log_method_call
-from tools.save import save_submission_as_csv
-from tools.schema import Schema
-from tools.task import Data, Task
+from spaceship_titanic.models.xgboosting import train_xgboosting
 
 
 class SpaceshipTitanicTrain(Task):
@@ -89,6 +90,8 @@ class SpaceshipTitanicTrain(Task):
                 return train_light_lgbm(params=params)
             case "--catboost":
                 return train_catboost(params=params)
+            case "--xgboosting":
+                return train_xgboosting(params=params)
             case _:
                 raise KeyError(f"Model {self.model} not found!")
 
