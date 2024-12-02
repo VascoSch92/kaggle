@@ -1,0 +1,9 @@
+random_state: 42
+
+paths:
+  data: "./insurance/data"
+  schema: "./insurance/data/schema.pkl"
+  train: "./insurance/data/train.csv"
+  test: "./insurance/data/test.csv"
+  train_preprocessed: "./insurance/data/train_preprocessed.csv"
+  test_preprocessed: "./insurance/data/test_preprocessed.csv"

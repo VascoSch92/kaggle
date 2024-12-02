@@ -2,6 +2,8 @@ import os
 
 from tools.cli import validate_model, extract_arguments, execute_error_message
 from tools.task import Pipeline
+from insurance.etl import InsuranceEtl
+from insurance.train import InsuranceTrain
 from mental_health.etl import MentalHealthEtl
 from mental_health.train import MentalHealthTrain
 from spaceship_titanic.etl import SpaceshipTitanicEtl
@@ -21,16 +23,22 @@ def main() -> None:
     match project:
         case "mental-health":
             match model:
-                case "--preprocess":
+                case "--etl":
                     Pipeline(MentalHealthEtl).run()
                 case _:
                     Pipeline(MentalHealthEtl, MentalHealthTrain).run()
         case "spaceship-titanic":
             match model:
-                case "--preprocess":
+                case "--etl":
                     Pipeline(SpaceshipTitanicEtl).run()
                 case _:
                     Pipeline(SpaceshipTitanicEtl, SpaceshipTitanicTrain).run()
+        case "insurance":
+            match model:
+                case "--etl":
+                    Pipeline(InsuranceEtl).run()
+                case _:
+                    Pipeline(InsuranceEtl, InsuranceTrain).run()
         case _:
             execute_error_message(
                 message=f"Project {project} not present.",
