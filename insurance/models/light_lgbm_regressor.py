@@ -8,7 +8,7 @@ from sklearn.metrics import root_mean_squared_log_error
 warnings.filterwarnings("ignore")
 
 
-def train_light_lgbm(params: namedtuple) -> LGBMRegressor:
+def train_light_lgbm_regressor(params: namedtuple) -> LGBMRegressor:
     params.logger.info("Starting LGBMClassifier Training")
 
     def objective(trial):
@@ -44,7 +44,7 @@ def train_light_lgbm(params: namedtuple) -> LGBMRegressor:
 
     params.logger.info("Start study")
     study = optuna.create_study(direction="minimize", study_name="LGBMRegressor")
-    study.optimize(objective, n_trials=10)
+    study.optimize(objective, n_trials=15)
 
     best_model = LGBMRegressor(**study.best_params)
     best_model.fit(

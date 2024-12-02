@@ -12,7 +12,7 @@ from tools.save import save_submission_as_csv
 from tools.task import Data, Task
 from tools.logger import log_method_call
 from tools.schema import Schema
-from insurance.models.light_lgbm import train_light_lgbm
+from insurance.models.light_lgbm_regressor import train_light_lgbm_regressor
 
 
 class InsuranceTrain(Task):
@@ -86,8 +86,8 @@ class InsuranceTrain(Task):
     @log_method_call
     def _training_model(self, params: "Params") -> Any:
         match self.model:
-            case "--light-lgbm":
-                return train_light_lgbm(params=params)
+            case "--light-lgbm-regressor":
+                return train_light_lgbm_regressor(params=params)
             case _:
                 raise KeyError(f"Model {self.model} not found!")
 
