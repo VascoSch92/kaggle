@@ -44,7 +44,7 @@ def train_light_lgbm_regressor(params: namedtuple) -> LGBMRegressor:
 
     params.logger.info("Start study")
     study = optuna.create_study(direction="minimize", study_name="LGBMRegressor")
-    study.optimize(objective, n_trials=15)
+    study.optimize(objective, n_trials=20)
 
     best_model = LGBMRegressor(**study.best_params)
     best_model.fit(
