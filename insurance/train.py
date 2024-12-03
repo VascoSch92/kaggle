@@ -12,6 +12,7 @@ from tools.save import save_submission_as_csv
 from tools.task import Data, Task
 from tools.logger import log_method_call
 from tools.schema import Schema
+from insurance.models.xgboost_regressor import train_xgboost_regressor
 from insurance.models.catboost_regressor import train_catboost_regressor
 from insurance.models.light_lgbm_regressor import train_light_lgbm_regressor
 
@@ -91,6 +92,8 @@ class InsuranceTrain(Task):
                 return train_light_lgbm_regressor(params=params)
             case "--catboost-regressor":
                 return train_catboost_regressor(params=params)
+            case "--xgboost-regressor":
+                return train_xgboost_regressor(params=params)
             case _:
                 raise KeyError(f"Model {self.model} not found!")
 
