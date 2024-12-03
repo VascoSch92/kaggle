@@ -37,12 +37,15 @@ def train_light_lgbm_regressor(params: namedtuple) -> LGBMRegressor:
             eval_metric="neg_mean_squared_log_error",
         )
 
-        y_pred = model.predict(params.X_val)
-        score = root_mean_squared_log_error(y_pred, params.y_val)
+        y_train = model.predict(params.X_train)
+        y_val_pred = model.predict(params.X_val)
 
-        return score
+        train_score = root_mean_squared_log_error(y_train, params.y_train)
+        val_score = root_mean_squared_log_error(y_val_pred, params.y_val)
 
-    params.logger.info("Start study")
+        return (train_score + val_score) / 2.0
+
+    params.logger.info("Start study with Optuna")
     study = optuna.create_study(direction="minimize", study_name="LGBMRegressor")
     study.optimize(objective, n_trials=20)
 
