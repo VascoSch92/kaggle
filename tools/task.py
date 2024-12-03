@@ -20,12 +20,19 @@ class Task(ABC, LoggerSetup):
         if self.config_path:
             self.config = load_config(filepath=Path(self.config_path))
 
+    def skip_task(self) -> bool:
+        """Overwrite this method in a subclass if you want to skip the task."""
+        return False
+
     def run(self) -> None:
-        self.logger.info(f"Starting task `{self.__class__.__name__}`")
-        start_time = time.time()
-        self.run_task()
-        end_time = time.time()
-        self.logger.info(f"Task completed in {round(end_time - start_time, 2)} seconds")
+        if self.skip_task():
+            self.logger.info(f"Task {self.__class__.__name__} skipped.")
+        else:
+            self.logger.info(f"Starting task `{self.__class__.__name__}`")
+            start_time = time.time()
+            self.run_task()
+            end_time = time.time()
+            self.logger.info(f"Task completed in {round(end_time - start_time, 2)} seconds")
 
     @abstractmethod
     def run_task(self) -> None:
