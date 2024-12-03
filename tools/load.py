@@ -33,7 +33,7 @@ def load_config(filepath: Path) -> "Params":
 
 def load_from_csv(filepath: Union[Path, str], logger: Logger) -> pd.DataFrame:
     df = pd.read_csv(filepath)
-    logger.info(f"Loaded dataframe {filepath}: {len(df)} rows x {len(df.columns)} columns.")
+    logger.info(f"Loaded dataframe {filepath}: {len(df):_} rows x {len(df.columns):_} columns.")
     return df
 
 
