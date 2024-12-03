@@ -40,7 +40,7 @@ def train_xgboost_regressor(params: namedtuple) -> XGBRegressor:
 
     params.logger.info("Starting study with Optuna")
     study = optuna.create_study(direction="minimize", study_name="XGBooster")
-    study.optimize(objective, n_trials=10)
+    study.optimize(objective, n_trials=15)
 
     best_model = XGBRegressor(**study.best_params)
     best_model.fit(params.X_train, params.y_train, eval_set=[(params.X_val, params.y_val)], verbose=False)
