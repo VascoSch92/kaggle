@@ -1,4 +1,5 @@
 from typing import List
+from pathlib import Path
 
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler, OrdinalEncoder, StandardScaler
 
@@ -10,6 +11,10 @@ from tools.schema import Schema, ScalerType, EncodingType
 
 class InsuranceEtl(Task):
     config_path = "./insurance/config.yml"
+
+    def skip_task(self) -> bool:
+        """We skip the task if there is already a version of the processed dfs saved."""
+        return Path(self.config.paths.train_preprocessed).exists() and Path(self.config.paths.test_preprocessed)
 
     def run_task(self) -> None:
         dfs = Data(
