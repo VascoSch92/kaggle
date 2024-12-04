@@ -15,6 +15,7 @@ from tools.schema import Schema
 from insurance.models.xgboost_regressor import train_xgboost_regressor
 from insurance.models.catboost_regressor import train_catboost_regressor
 from insurance.models.light_lgbm_regressor import train_light_lgbm_regressor
+from insurance.models.random_forest_regressor import train_random_forest_regressor
 
 
 class InsuranceTrain(Task):
@@ -102,6 +103,8 @@ class InsuranceTrain(Task):
                 return train_catboost_regressor(params=params)
             case "--xgboost-regressor":
                 return train_xgboost_regressor(params=params)
+            case "--random-forest-regressor":
+                return train_random_forest_regressor(params=params)
             case _:
                 raise KeyError(f"Model {self.model} not found!")
 
