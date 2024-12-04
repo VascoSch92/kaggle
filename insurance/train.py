@@ -33,7 +33,7 @@ class InsuranceTrain(Task):
         )
 
         X, y = self._select_features_and_labels(dfs=dfs)
-        y = np.log2(y)
+        y = self._transform_labels(y=y)
 
         X_train, X_test, y_train, y_val = train_test_split(
             X,
@@ -64,6 +64,14 @@ class InsuranceTrain(Task):
         X = dfs.train[dfs.schema.numeric_features() + dfs.schema.catvar_features()]
         y = dfs.train[dfs.schema.labels]
         return X, y
+
+    @log_method_call
+    def _transform_labels(self, y: pd.DataFrame) -> pd.DataFrame:
+        return np.log2(y)
+
+    @log_method_call
+    def _inverse_transform_labels(self, y: pd.DataFrame) -> pd.DataFrame:
+        return np.exp2(y)
 
     @log_method_call
     def get_params(
@@ -123,7 +131,9 @@ class InsuranceTrain(Task):
     @log_method_call
     def _create_submission_dataframe(self, dfs: Data, model: Any) -> pd.DataFrame:
         submission_pred = model.predict(dfs.test[dfs.schema.numeric_features() + dfs.schema.catvar_features()])
-        submission = pd.DataFrame({"id": dfs.test.id, "Premium Amount": np.exp2(submission_pred)})
+        submission = pd.DataFrame(
+            {"id": dfs.test.id, "Premium Amount": self._inverse_transform_labels(y=submission_pred)}
+        )
         return submission
 
     @log_method_call

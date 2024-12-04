@@ -1,3 +1,4 @@
+import json
 import pickle
 from typing import Dict, List, Union
 from logging import Logger
@@ -41,3 +42,9 @@ def load_schema(filepath: Union[Path, str], logger: Logger) -> Schema:
     logger.info(f"Loaded schema from {filepath}")
     with Path(filepath).open("rb") as f:
         return pickle.load(f)
+
+
+def load_parameters(filepath: Union[Path, str], logger: Logger) -> Dict:
+    logger.info(f"Loaded parameters from {filepath}")
+    with Path(filepath).open("r") as file:
+        return json.load(file)
