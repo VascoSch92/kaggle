@@ -5,7 +5,7 @@ from collections import namedtuple
 import numpy as np
 import optuna
 from lightgbm import LGBMRegressor
-from sklearn.metrics import root_mean_squared_log_error
+from sklearn.metrics import root_mean_squared_error
 from sklearn.model_selection import cross_val_score
 
 from tools.load import load_parameters
@@ -30,13 +30,7 @@ def train_light_lgbm_regressor(params: namedtuple) -> LGBMRegressor:
         best_params = study.best_params
 
     best_model = LGBMRegressor(**best_params)
-    best_model.fit(
-        params.X_train,
-        params.y_train,
-        eval_set=[(params.X_val, params.y_val)],
-        eval_names=["validation"],
-        eval_metric="neg_mean_squared_log_error",
-    )
+    best_model.fit(params.X_train, params.y_train)
 
     params.logger.info(f"Best parameters found: {best_params}")
     params.logger.info(f"Best model score: {best_model.best_score_}")
@@ -68,11 +62,11 @@ def objective(trial, params: namedtuple) -> float:
         params.y_train,
         eval_set=[(params.X_val, params.y_val)],
         eval_names=["validation"],
-        eval_metric="neg_mean_squared_log_error",
+        eval_metric="neg_mean_squared_error",
     )
 
     y_val_pred = model.predict(params.X_val)
-    val_score = root_mean_squared_log_error(y_val_pred, params.y_val)
-    scores = cross_val_score(model, params.X_train, params.y_train, cv=5, scoring="neg_root_mean_squared_log_error")
+    val_score = root_mean_squared_error(y_val_pred, params.y_val)
+    scores = cross_val_score(model, params.X_train, params.y_train, cv=5, scoring="neg_mean_squared_error")
 
     return (np.mean(-1 * scores) + val_score) / 2

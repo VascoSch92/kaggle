@@ -4,7 +4,7 @@ from collections import namedtuple
 
 import numpy as np
 import pandas as pd
-from sklearn.metrics import root_mean_squared_log_error
+from sklearn.metrics import root_mean_squared_log_error, root_mean_squared_error
 from sklearn.model_selection import StratifiedKFold, train_test_split
 
 from tools.load import load_schema, load_from_csv
@@ -128,7 +128,7 @@ class InsuranceTrain(Task):
     ) -> None:
         y_pred = model.predict(X_val)
 
-        rmsle = root_mean_squared_log_error(y_val, y_pred=y_pred)
+        rmsle = root_mean_squared_error(y_val, y_pred=y_pred)
         self.logger.info(f"RMSLE on validation set: {rmsle:.4f}")
 
     @log_method_call
