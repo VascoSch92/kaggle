@@ -73,6 +73,6 @@ def objective(trial, params: namedtuple) -> float:
 
     y_val_pred = model.predict(params.X_val)
     val_score = root_mean_squared_log_error(y_val_pred, params.y_val)
-    scores = cross_val_score(model, params.X_train, params.y_train, cv=5, scoring="neg_mean_squared_error")
+    scores = cross_val_score(model, params.X_train, params.y_train, cv=5, scoring="neg_root_mean_squared_log_error")
 
-    return (np.mean(np.sqrt(-1 * scores)) + val_score) / 2
+    return np.sqrt((np.mean(-1 * scores) + val_score) / 2)
