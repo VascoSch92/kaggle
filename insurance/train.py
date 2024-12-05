@@ -4,8 +4,8 @@ from collections import namedtuple
 
 import numpy as np
 import pandas as pd
-from sklearn.metrics import root_mean_squared_log_error, root_mean_squared_error
-from sklearn.model_selection import StratifiedKFold, train_test_split
+from sklearn.metrics import root_mean_squared_error
+from sklearn.model_selection import RepeatedKFold, train_test_split
 
 from tools.load import load_schema, load_from_csv
 from tools.save import save_submission_as_csv
@@ -108,7 +108,6 @@ class InsuranceTrain(Task):
             case _:
                 raise KeyError(f"Model {self.model} not found!")
 
-    @log_method_call
     def _create_submission(
         self, X: pd.DataFrame, y: pd.DataFrame, dfs: Data, model: Any, params: "Params"
     ) -> pd.DataFrame:
@@ -129,7 +128,7 @@ class InsuranceTrain(Task):
         y_pred = model.predict(X_val)
 
         rmsle = root_mean_squared_error(y_val, y_pred=y_pred)
-        self.logger.info(f"RMSLE on validation set: {rmsle:.4f}")
+        self.logger.info(f"RMSLE on validation set: {rmsle:.5f}")
 
     @log_method_call
     def _create_submission_dataframe(self, dfs: Data, model: Any) -> pd.DataFrame:
@@ -147,12 +146,13 @@ class InsuranceTrain(Task):
         dfs: Data,
         model: Any,
     ) -> pd.DataFrame:
-        stratified_k_fold = StratifiedKFold(10, shuffle=True, random_state=self.config.random_state)
+        stratified_k_fold = RepeatedKFold(n_splits=5, n_repeats=10, random_state=self.config.random_state)
         splits = stratified_k_fold.split(X, y)
 
         scores, test_predictions = [], []
         for i, (full_train_idx, valid_idx) in enumerate(splits):
             model_fold = model
+
             X_train_fold, X_valid_fold = X.loc[full_train_idx], X.loc[valid_idx]
             y_train_fold, y_valid_fold = y.loc[full_train_idx], y.loc[valid_idx]
 
@@ -160,20 +160,18 @@ class InsuranceTrain(Task):
 
             pred_valid_fold = model_fold.predict(X_valid_fold)
 
-            score = root_mean_squared_log_error(y_valid_fold, pred_valid_fold)
+            score = root_mean_squared_error(y_valid_fold, pred_valid_fold)
             scores.append(score)
             test_df_pred = model_fold.predict(dfs.test[dfs.schema.numeric_features() + dfs.schema.catvar_features()])
             test_predictions.append(test_df_pred)
-            self.logger.info(f"Fold {i + 1} Accuracy Score: {score}")
+            self.logger.info(f"Fold {i + 1} RMSLE: {score:.5f}")
 
-        self.logger.info(f"mean RMQL Score: {np.mean(scores):.4f}")
+        self.logger.info(f"mean RMSLE: {np.mean(scores):.5f}")
 
         submission = pd.DataFrame(
             {
-                "PassengerId": dfs.test.PassengerId,
-                "Transported": np.round(np.mean(test_predictions, axis=0)),
+                "id": dfs.test.id,
+                "Premium Amount": self._inverse_transform_labels(np.mean(test_predictions, axis=0)),
             }
         )
-        submission["Transported"] = submission.Transported.astype(bool)
-
         return submission

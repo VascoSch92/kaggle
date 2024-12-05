@@ -33,7 +33,9 @@ def train_light_lgbm_regressor(params: namedtuple) -> LGBMRegressor:
     best_model.fit(params.X_train, params.y_train)
 
     params.logger.info(f"Best parameters found: {best_params}")
-    params.logger.info(f"Best model score: {best_model.best_score_}")
+    y_val_pred = best_model.predict(params.X_val)
+    val_score = root_mean_squared_error(y_val_pred, params.y_val)
+    params.logger.info(f"Validation score: {val_score:.5f}")
 
     save_parameters(path=params_path, parameters=best_params, logger=params.logger)
     return best_model
@@ -52,7 +54,7 @@ def objective(trial, params: namedtuple) -> float:
         "lambda_l1": trial.suggest_loguniform("lambda_l1", 1e-8, 10.0),
         "lambda_l2": trial.suggest_loguniform("lambda_l2", 1e-8, 10.0),
         "random_state": params.config.random_state,
-        "verbose": -1,
+        "verbosity": -1,
         "num_threads": -1,  # Use a single thread,
     }
 
