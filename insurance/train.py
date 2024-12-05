@@ -164,9 +164,9 @@ class InsuranceTrain(Task):
             scores.append(score)
             test_df_pred = model_fold.predict(dfs.test[dfs.schema.numeric_features() + dfs.schema.catvar_features()])
             test_predictions.append(test_df_pred)
-            self.logger.info(f"Fold {i + 1} RMSLE: {score:.5f}")
+            self.logger.info(f"Fold {i + 1} RMSE: {score:.5f}")
 
-        self.logger.info(f"mean RMSLE: {np.mean(scores):.5f}")
+        self.logger.info(f"mean RMSE: {np.mean(scores):.5f}")
 
         submission = pd.DataFrame(
             {

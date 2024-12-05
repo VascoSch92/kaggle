@@ -3,8 +3,7 @@ from pathlib import Path
 from collections import namedtuple
 
 import optuna
-from catboost import CatBoostRegressor
-from sklearn.metrics import root_mean_squared_log_error
+from catboost import Pool, CatBoostRegressor, cv
 
 from tools.load import load_parameters
 from tools.save import save_parameters
@@ -27,7 +26,7 @@ def train_catboost_regressor(params: namedtuple) -> CatBoostRegressor:
 
         func = lambda trial: objective(trial, params)
         study = optuna.create_study(direction="minimize", study_name="CatBoostRegressor")
-        study.optimize(func, n_trials=15)
+        study.optimize(func, n_trials=10)
         best_params = study.best_params
 
     best_model = CatBoostRegressor(**best_params, verbose=False)
@@ -42,27 +41,29 @@ def train_catboost_regressor(params: namedtuple) -> CatBoostRegressor:
 
 def objective(trial, params: namedtuple) -> float:
     param = {
+        "loss_function": "RMSE",
         "iterations": trial.suggest_int("iterations", 100, 1000),
         "learning_rate": trial.suggest_loguniform("learning_rate", 1e-5, 1e-1),
         "depth": trial.suggest_int("depth", 3, 10),
         "l2_leaf_reg": trial.suggest_loguniform("l2_leaf_reg", 0.01, 10.0),
         "border_count": trial.suggest_int("border_count", 32, 255),
         "bagging_temperature": trial.suggest_loguniform("bagging_temperature", 0.1, 10.0),
-        "cat_features": params.schema.catvar_features(),  # Specify categorical features if any
+        "cat_features": params.schema.catvar_features(),
         "random_seed": params.config.random_state,
         "eval_metric": "MSLE",
         "verbose": False,
     }
 
-    model = CatBoostRegressor(**param)
-    model.fit(
-        params.X_train,
-        params.y_train,
-        early_stopping_rounds=10,
-        eval_set=[(params.X_val, params.y_val)],
+    cv_data = Pool(params.X_train, params.y_train, cat_features=params.schema.catvar_features())
+    cv_results = cv(
+        params=param,
+        pool=cv_data,
+        fold_count=3,
+        type="Regression",
+        verbose=False,
+        early_stopping_rounds=3,
     )
 
-    y_pred = model.predict(params.X_val)
-    score = root_mean_squared_log_error(y_pred, params.y_val)
+    score = cv_results["test-RMSE-mean"].iloc[-1]
 
     return score
