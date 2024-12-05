@@ -2,7 +2,9 @@ import warnings
 from pathlib import Path
 from collections import namedtuple
 
+import numpy as np
 import optuna
+import pandas as pd
 from catboost import Pool, CatBoostRegressor, cv
 
 from tools.load import load_parameters
@@ -28,6 +30,7 @@ def train_catboost_regressor(params: namedtuple) -> CatBoostRegressor:
         study = optuna.create_study(direction="minimize", study_name="CatBoostRegressor")
         study.optimize(func, n_trials=10)
         best_params = study.best_params
+        best_params.update({"loss_function": "RMSE"})
 
     best_model = CatBoostRegressor(**best_params, verbose=False)
     best_model.fit(params.X_train, params.y_train, early_stopping_rounds=10)
@@ -54,7 +57,10 @@ def objective(trial, params: namedtuple) -> float:
         "verbose": False,
     }
 
-    cv_data = Pool(params.X_train, params.y_train, cat_features=params.schema.catvar_features())
+    X = pd.concat([params.X_train, params.X_val])
+    y = pd.concat([params.y_train, params.y_val])
+
+    cv_data = Pool(X, y, cat_features=params.schema.catvar_features())
     cv_results = cv(
         params=param,
         pool=cv_data,
@@ -64,6 +70,6 @@ def objective(trial, params: namedtuple) -> float:
         early_stopping_rounds=3,
     )
 
-    score = cv_results["test-RMSE-mean"].iloc[-1]
+    score = np.mean(cv_results["test-RMSE-mean"])
 
     return score
