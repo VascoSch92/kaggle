@@ -62,10 +62,10 @@ def objective(trial, params: namedtuple) -> float:
     cv_results = cv(
         params=param,
         pool=train_pool,
-        fold_count=3,
+        fold_count=5,
         type="Regression",
         verbose=False,
-        early_stopping_rounds=3,
+        early_stopping_rounds=10,
         return_models=True,
     )
 
