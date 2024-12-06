@@ -4,8 +4,8 @@ from collections import namedtuple
 
 import numpy as np
 import optuna
-import pandas as pd
 from catboost import Pool, CatBoostRegressor, cv
+from sklearn.metrics import root_mean_squared_error
 
 from tools.load import load_parameters
 from tools.save import save_parameters
@@ -57,19 +57,20 @@ def objective(trial, params: namedtuple) -> float:
         "verbose": False,
     }
 
-    X = pd.concat([params.X_train, params.X_val])
-    y = pd.concat([params.y_train, params.y_val])
-
-    cv_data = Pool(X, y, cat_features=params.schema.catvar_features())
+    train_pool = Pool(params.X_train, params.y_train, cat_features=params.schema.catvar_features())
+    val_pool = Pool(params.X_val, params.y_val, cat_features=params.schema.catvar_features())
     cv_results = cv(
         params=param,
-        pool=cv_data,
+        pool=train_pool,
         fold_count=3,
         type="Regression",
         verbose=False,
         early_stopping_rounds=3,
+        return_models=True,
     )
 
-    score = np.mean(cv_results["test-RMSE-mean"])
+    y_val_pred = np.mean([model.predict(val_pool) for model in cv_results[1]], axis=0)
+    val_score = root_mean_squared_error(y_val_pred, params.y_val)
 
-    return score
+    score = np.mean(cv_results[0]["test-RMSE-mean"])
+    return (score + val_score) / 2
