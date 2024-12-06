@@ -1,6 +1,7 @@
 from typing import List
 from pathlib import Path
 
+import pandas as pd
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler, OrdinalEncoder, StandardScaler
 
 from tools.load import load_from_csv
@@ -91,7 +92,24 @@ class InsuranceEtl(Task):
 
     @log_method_call
     def _features_engineering(self, dfs: Data) -> Data:
-        # policy start date extract different features with dates
+        for df in [dfs.train, dfs.test]:
+            df["Policy Start Date"] = pd.to_datetime(df["Policy Start Date"])
+
+            # Extract year, month, and day of the week
+            df["policy year"] = df["Policy Start Date"].dt.year
+            df["policy month"] = df["Policy Start Date"].dt.month
+            df["policy day of week"] = df["Policy Start Date"].dt.day_name()
+            df["policy quarter"] = df["Policy Start Date"].dt.quarter
+
+        dfs.schema.catvar.update(
+            {
+                "policy year": EncodingType.ORDINAL_ENCODING,
+                "policy month": EncodingType.ORDINAL_ENCODING,
+                "policy day of week": EncodingType.LABEL_ENCODING,
+                "policy quarter": EncodingType.ORDINAL_ENCODING,
+            }
+        )
+
         # smoking status and exercice frequency can be combined to form a new feature
         return dfs
 

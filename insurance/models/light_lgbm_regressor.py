@@ -32,9 +32,10 @@ def train_light_lgbm_regressor(params: namedtuple) -> LGBMRegressor:
     best_model = LGBMRegressor(**best_params)
     best_model.fit(params.X_train, params.y_train)
 
-    params.logger.info(f"Best parameters found: {best_params}")
     y_val_pred = best_model.predict(params.X_val)
     val_score = root_mean_squared_error(y_val_pred, params.y_val)
+
+    params.logger.info(f"Best parameters found: {best_params}")
     params.logger.info(f"Validation score: {val_score:.5f}")
 
     save_parameters(path=params_path, parameters=best_params, logger=params.logger)
