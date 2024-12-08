@@ -17,6 +17,7 @@ from insurance.models.xgboost_regressor import train_xgboost_regressor
 from insurance.models.catboost_regressor import train_catboost_regressor
 from insurance.models.light_lgbm_regressor import train_light_lgbm_regressor
 from insurance.models.random_forest_regressor import train_random_forest_regressor
+from insurance.models.hist_gradient_boosting_regressor import train_hist_gradient_boosting_regressor
 
 
 class InsuranceTrain(Task):
@@ -106,6 +107,8 @@ class InsuranceTrain(Task):
                 return train_xgboost_regressor(params=params)
             case "--random-forest-regressor":
                 return train_random_forest_regressor(params=params)
+            case "--hist-gradient-boosting-regressor":
+                return train_hist_gradient_boosting_regressor(params=params)
             case "--voting-regressor":
                 return train_voting_regressor(params=params)
             case _:
