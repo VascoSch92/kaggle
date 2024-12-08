@@ -29,6 +29,7 @@ def train_hist_gradient_boosting_regressor(params: namedtuple) -> HistGradientBo
         study.optimize(func, n_trials=10)
         best_params = study.best_params
 
+
     best_model = HistGradientBoostingRegressor(**best_params)
     best_model.fit(params.X_train, params.y_train)
 
