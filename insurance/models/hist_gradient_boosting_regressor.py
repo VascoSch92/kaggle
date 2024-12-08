@@ -26,9 +26,8 @@ def train_hist_gradient_boosting_regressor(params: namedtuple) -> HistGradientBo
 
         func = lambda trial: objective(trial, params)
         study = optuna.create_study(direction="minimize", study_name="HistGradientBoostingRegressor")
-        study.optimize(func, n_trials=10)
+        study.optimize(func, n_trials=20)
         best_params = study.best_params
-
 
     best_model = HistGradientBoostingRegressor(**best_params)
     best_model.fit(params.X_train, params.y_train)
