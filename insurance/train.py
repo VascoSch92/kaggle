@@ -15,6 +15,7 @@ from tools.schema import Schema
 from insurance.models.voting_regressor import train_voting_regressor
 from insurance.models.xgboost_regressor import train_xgboost_regressor
 from insurance.models.catboost_regressor import train_catboost_regressor
+from insurance.models.stacking_regressor import train_stacking_regressor
 from insurance.models.light_lgbm_regressor import train_light_lgbm_regressor
 from insurance.models.random_forest_regressor import train_random_forest_regressor
 from insurance.models.hist_gradient_boosting_regressor import train_hist_gradient_boosting_regressor
@@ -111,6 +112,8 @@ class InsuranceTrain(Task):
                 return train_hist_gradient_boosting_regressor(params=params)
             case "--voting-regressor":
                 return train_voting_regressor(params=params)
+            case "--stacking-regressor":
+                return train_stacking_regressor(params=params)
             case _:
                 raise KeyError(f"Model {self.model} not found!")
 
