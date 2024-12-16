@@ -155,7 +155,7 @@ class InsuranceTrain(Task):
         dfs: Data,
         model: Any,
     ) -> pd.DataFrame:
-        stratified_k_fold = RepeatedKFold(n_splits=5, n_repeats=3, random_state=self.config.random_state)
+        stratified_k_fold = RepeatedKFold(n_splits=5, n_repeats=4, random_state=self.config.random_state)
         splits = stratified_k_fold.split(X, y)
 
         scores, test_predictions = [], []
