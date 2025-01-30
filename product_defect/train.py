@@ -4,7 +4,7 @@ from collections import namedtuple
 
 import numpy as np
 import pandas as pd
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import recall_score, accuracy_score, classification_report
 from sklearn.model_selection import StratifiedKFold, train_test_split
 
 from tools.load import load_schema, load_from_csv
@@ -13,6 +13,7 @@ from tools.task import Data, Task
 from tools.logger import log_method_call
 from tools.schema import Schema
 from product_defect.models.light_lgbm import train_light_lgbm
+from product_defect.models.xgboosting import train_xgboosting
 
 
 class ProductDefectTrain(Task):
@@ -86,6 +87,8 @@ class ProductDefectTrain(Task):
         match self.model:
             case "--light-lgbm":
                 return train_light_lgbm(params=params)
+            case "--xgboosting":
+                return train_xgboosting(params=params)
             case _:
                 raise KeyError(f"Model {self.model} not found!")
 
@@ -109,8 +112,8 @@ class ProductDefectTrain(Task):
     ) -> None:
         y_pred = model.predict(X_val)
 
-        accuracy = accuracy_score(y_val, y_pred=y_pred)
-        self.logger.info(f"Accuracy on validation set: {accuracy:.4f}")
+        accuracy = recall_score(y_true=y_val, y_pred=y_pred)
+        self.logger.info(f"Recall score on validation set: {accuracy:.4f}")
 
         report = classification_report(y_true=y_val, y_pred=y_pred)
         self.logger.info(f"Classification report \n {report}")
