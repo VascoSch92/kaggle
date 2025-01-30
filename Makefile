@@ -2,11 +2,7 @@
 
 # variables
 # you can set the first variable from the environment
-PYPI_PASSWORD   ?=
-DISTDIR         = dist
-DOCSDIR         = docs
-SOURCEDIR       = symmetria
-TESTSDIR        = tests
+
 
 # It is first such that "make" without argument is like "make help".
 help:
@@ -19,13 +15,12 @@ help:
 
 clean:
 	@echo "[INFO] Clean caches and others"
-	@rm -rf "./$(DISTDIR)"
 	@rm -rf "./.pytest_cache"
 	@rm -rf "./.cache"
 	@rm -rf "./catboost_info"
 
 ruff:
 	@echo "[INFO] Ruff checks & format"
-	@ruff format .
-	@ruff check . --fix
+	@uv run ruff format .
+	@uv run ruff check . --fix
 
