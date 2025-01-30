@@ -41,6 +41,22 @@ Where:
 
 ## Competitions
 
+- [Spaceship Titanic](#spaceship-titanic)
+- [Exploring Mental Health Data](#exploring-mental-health-data)
+- [Regression With An Insurance Dataset](#regression-with-an-insurance-dataset)
+
+### Spaceship Titanic
+
+Predict which passengers are transported to an alternate dimension
+
+**Page of the competition:** [link](https://www.kaggle.com/competitions/spaceship-titanic)
+
+| Commit Message                                                     | Score    | Ranking |
+|--------------------------------------------------------------------|----------|---------|
+| `8355f6cb(spaceship-titanic --booster-ensemble --stratification)`  | 0.80523  | top 11% |
+| `8dae923c(spaceship-titanic --catboost)`                           | 0.80476  | top 12% |
+
+
 ### Exploring Mental Health Data
 
 Playground Series - Season 4, Episode 11
@@ -55,15 +71,15 @@ Playground Series - Season 4, Episode 11
 | `b9de241d(mental-health --light-lgbm)`                        | 0.94131      | 0.94011       |
 
 
+### Regression with an Insurance Dataset
 
-### Spaceship Titanic
+Playground Series - Season 4, Episode 12
 
-Predict which passengers are transported to an alternate dimension
+**Page of the competition:** [link](https://www.kaggle.com/competitions/playground-series-s4e12/overview)
 
-**Page of the competition:** [link](https://www.kaggle.com/competitions/spaceship-titanic)
+**Ranked:** 449/2390 (top 19%)
 
-| Commit Message                                                     | Score    | Ranking |
-|--------------------------------------------------------------------|----------|---------|
-| `8355f6cb(spaceship-titanic --booster-ensemble --stratification)`  | 0.80523  | top 11% |
-| `8dae923c(spaceship-titanic --catboost)`                           | 0.80476  | top 12% |
-
+| Commit Message                                              | Public Score | Private Score |
+|-------------------------------------------------------------|--------------|---------------|
+| `32e0a842(insurance --stacking-regressor --stratification)` | 1.04487      | 1.04665       |
+| `07bf2a1d(insurance --light-lgbm --stratification)`         | 1.04487      | 1.04675       |
