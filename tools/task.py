@@ -61,7 +61,7 @@ class Pipeline(LoggerSetup):
         tasks_names = self._get_tasks_names()
         times = collections.defaultdict(float)
         self.logger.info(f"Starting pipeline: {' -> '.join(tasks_names)}")
-        for task_name, task in zip(tasks_names, self.tasks):
+        for task_name, task in zip(tasks_names, self.tasks, strict=False):
             start_time = time.time()
             task().run()
             end_time = time.time()
@@ -72,10 +72,12 @@ class Pipeline(LoggerSetup):
         return [str(task).split(".")[-1][:-2] for task in self.tasks]
 
     def _get_analysis_pipeline(self, times: Dict[str, float]) -> str:
-        msg = ""
-        msg += f"Pipeline completed in {sum(times.values())} seconds. \n"
-        msg += "Details:"
+        msg = [
+            "",
+            f"Pipeline completed in {sum(times.values())} seconds. \n",
+            "Details:",
+        ]
         for k, v in times.items():
-            msg += "\n"
-            msg += f" - {k}: {v} seconds"
-        return msg
+            msg.append("\n")
+            msg.append(f" - {k}: {v} seconds")
+        return " ".join(msg)

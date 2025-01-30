@@ -1,0 +1,9 @@
+random_state: 42
+
+paths:
+  data: "./product_defect/data"
+  schema: "./product_defect/data/schema.pkl"
+  train: "./product_defect/data/train.csv"
+  test: "./product_defect/data/test.csv"
+  train_preprocessed: "./product_defect/data/train_processed.csv"
+  test_preprocessed: "./product_defect/data/test_processed.csv"

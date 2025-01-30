@@ -4,7 +4,7 @@ from insurance.models.light_lgbm_regressor import train_light_lgbm_regressor
 from insurance.models.hist_gradient_boosting_regressor import train_hist_gradient_boosting_regressor
 
 
-def train_stacking_regressor(params):
+def train_stacking_regressor(params) -> StackingRegressor:
     params.logger.info("Starting StackingRegressor Training")
     lightlgbm = train_light_lgbm_regressor(params=params)
     histboost = train_hist_gradient_boosting_regressor(params=params)

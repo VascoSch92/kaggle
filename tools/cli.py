@@ -45,6 +45,9 @@ def extract_arguments() -> Tuple[str, str, Optional[List[str]]]:
 def retrieve_valid_models(project: str) -> Set[str]:
     valid_pipelines = set()
     project_directory = Path().cwd() / project.replace("-", "_") / "models"
+    if project_directory.exists() is False:
+        return set()
+
     for p in project_directory.iterdir():
         candidate = p.stem
         if not candidate.startswith("__"):

@@ -19,6 +19,13 @@ clean:
 	@rm -rf "./.cache"
 	@rm -rf "./catboost_info"
 
+dev:
+	@echo "[INFO] Created venv"
+	@rm -rf "./.venv"
+	@uv venv
+	@uv sync --all-groups
+	@uv pip list
+
 ruff:
 	@echo "[INFO] Ruff checks & format"
 	@uv run ruff format .
