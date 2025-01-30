@@ -39,7 +39,7 @@ def train_light_lgbm(params: namedtuple) -> LGBMClassifier:
             eval_metric="binary_error",
         )
 
-        scores = cross_val_score(model, params.X_train, params.y_train, cv=cat_cv, scoring="accuracy")
+        scores = cross_val_score(model, params.X_train, params.y_train, cv=cat_cv, scoring="recall")
 
         return scores.mean()
 
