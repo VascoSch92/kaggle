@@ -7,14 +7,14 @@ from product_defect.models.light_lgbm import train_light_lgbm
 from product_defect.models.xgboosting import train_xgboosting
 
 
-def train_booster_ensemble(params: namedtuple) -> VotingClassifier:
-    params.logger.info("Starting Booster Training")
+def train_voting_ensemble(params: namedtuple) -> VotingClassifier:
+    params.logger.info("Starting VotingClassifier Training")
     catboost = train_catboost(params=params)
     lightlgbm = train_light_lgbm(params=params)
     xgboosting = train_xgboosting(params=params)
     model = VotingClassifier(
         estimators=[
-            ("catboost", catboost),
+            # ("catboost", catboost),
             ("lightlgbm", lightlgbm),
             ("xgboost", xgboosting),
         ],
