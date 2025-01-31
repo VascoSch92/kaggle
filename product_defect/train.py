@@ -152,7 +152,7 @@ class ProductDefectTrain(Task):
             scores.append(score)
             test_df_pred = model_fold.predict(dfs.test[dfs.schema.numeric_features() + dfs.schema.catvar_features()])
             test_predictions.append(test_df_pred)
-            self.logger.info(f"Fold {i + 1} Recall Score: {score}")
+            self.logger.info(f"Fold {i + 1} Recall Score: {score:.4f}")
 
         self.logger.info(f"Mean Recall Score: {np.mean(scores):.4f}")
 
