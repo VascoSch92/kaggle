@@ -1,15 +1,16 @@
-from lightgbm import LGBMClassifier
+from xgboost import XGBClassifier
 from sklearn.ensemble import BaggingClassifier
 
-from product_defect.models.light_lgbm import train_light_lgbm
+from product_defect.models.xgboosting import train_xgboosting
 
 
 def train_bagging_ensemble(params: "Params") -> BaggingClassifier:
     params.logger.info("Start BaggingClassifier Training.")
-    light_lgbm = train_light_lgbm(params)
+    boosting = train_xgboosting(params=params)
+
     model = BaggingClassifier(
-        estimator=LGBMClassifier(**light_lgbm.get_params()),
-        n_estimators=5,
+        estimator=XGBClassifier(**boosting.get_params()),
+        n_estimators=10,
         random_state=params.config.random_state,
         verbose=False,
     )
