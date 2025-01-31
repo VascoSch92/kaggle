@@ -4,7 +4,7 @@ from collections import namedtuple
 
 import numpy as np
 import pandas as pd
-from sklearn.metrics import recall_score, accuracy_score, classification_report
+from sklearn.metrics import recall_score, classification_report
 from sklearn.model_selection import StratifiedKFold, train_test_split
 
 from tools.load import load_schema, load_from_csv
@@ -15,6 +15,7 @@ from tools.schema import Schema
 from product_defect.models.catboost import train_catboost
 from product_defect.models.light_lgbm import train_light_lgbm
 from product_defect.models.xgboosting import train_xgboosting
+from product_defect.models.booster_ensemble import train_booster_ensemble
 
 
 class ProductDefectTrain(Task):
@@ -92,6 +93,8 @@ class ProductDefectTrain(Task):
                 return train_xgboosting(params=params)
             case "--catboost":
                 return train_catboost(params=params)
+            case "--booster-ensemble":
+                return train_booster_ensemble(params=params)
             case _:
                 raise KeyError(f"Model {self.model} not found!")
 
