@@ -12,6 +12,7 @@ from tools.save import save_submission_as_csv
 from tools.task import Data, Task
 from tools.logger import log_method_call
 from tools.schema import Schema
+from product_defect.models.catboost import train_catboost
 from product_defect.models.light_lgbm import train_light_lgbm
 from product_defect.models.xgboosting import train_xgboosting
 
@@ -89,6 +90,8 @@ class ProductDefectTrain(Task):
                 return train_light_lgbm(params=params)
             case "--xgboosting":
                 return train_xgboosting(params=params)
+            case "--catboost":
+                return train_catboost(params=params)
             case _:
                 raise KeyError(f"Model {self.model} not found!")
 
