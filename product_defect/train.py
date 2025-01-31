@@ -17,7 +17,7 @@ from product_defect.models.light_lgbm import train_light_lgbm
 from product_defect.models.xgboosting import train_xgboosting
 from product_defect.models.voting_ensemble import train_voting_ensemble
 from product_defect.models.stacking_ensemble import train_stacking_ensemble
-
+from product_defect.models.hist_gradient import train_hist_gradient_boosting
 
 class ProductDefectTrain(Task):
     config_path = "./product_defect/config.yml"
@@ -98,6 +98,8 @@ class ProductDefectTrain(Task):
                 return train_voting_ensemble(params=params)
             case "--stacking-ensemble":
                 return train_stacking_ensemble(params=params)
+            case "--hist-gradient":
+                return train_hist_gradient_boosting(params=params)
             case _:
                 raise KeyError(f"Model {self.model} not found!")
 
