@@ -3,9 +3,8 @@ from collections import namedtuple
 
 import numpy as np
 import optuna
+from sklearn.metrics import recall_score, root_mean_squared_error
 from sklearn.ensemble import HistGradientBoostingClassifier
-from sklearn.metrics import recall_score
-from sklearn.metrics import root_mean_squared_error
 from sklearn.model_selection import cross_val_score
 
 warnings.filterwarnings("ignore")
