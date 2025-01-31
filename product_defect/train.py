@@ -16,6 +16,7 @@ from product_defect.models.catboost import train_catboost
 from product_defect.models.light_lgbm import train_light_lgbm
 from product_defect.models.xgboosting import train_xgboosting
 from product_defect.models.hist_gradient import train_hist_gradient_boosting
+from product_defect.models.random_forest import train_random_forest_classifier
 from product_defect.models.voting_ensemble import train_voting_ensemble
 from product_defect.models.bagging_ensemble import train_bagging_ensemble
 from product_defect.models.stacking_ensemble import train_stacking_ensemble
@@ -104,6 +105,8 @@ class ProductDefectTrain(Task):
                 return train_hist_gradient_boosting(params=params)
             case "--bagging-ensemble":
                 return train_bagging_ensemble(params=params)
+            case "--random-forest":
+                return train_random_forest_classifier(params=params)
             case _:
                 raise KeyError(f"Model {self.model} not found!")
 
