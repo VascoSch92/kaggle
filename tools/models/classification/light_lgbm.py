@@ -56,13 +56,9 @@ def train_light_lgbm(config: Config) -> LGBMClassifier:
     best_model.fit(
         config.X_train,
         config.y_train,
-        eval_set=[(config.X_val, config.y_val)],
-        eval_names=["validation"],
-        eval_metric=config.light_lgbm.eval_metric,
     )
 
     config.logger.info(f"Best parameters found: {study.best_params}")
     config.logger.info(f"Best model score: {study.best_value}")
-    config.logger.info(f"Best validation score: {best_model.evals_result_['validation'][config.light_lgbm.eval_metric][-1]}")
 
     return best_model
