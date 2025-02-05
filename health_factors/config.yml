@@ -16,3 +16,5 @@ light_lgbm:
   cross_validation:
     n_splits: 5
     scoring: "roc_auc"
+  optuna:
+    n_trials: 20

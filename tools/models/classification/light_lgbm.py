@@ -52,9 +52,9 @@ def train_light_lgbm(config: Config) -> LGBMClassifier:
 
         return scores.mean()
 
-    config.logger.info("Start study")
+    config.logger.info(f"Start Optuna study with {config.light_lgbm.optuna.n_trials} trials")
     study = optuna.create_study(direction="maximize")
-    study.optimize(objective, n_trials=10)
+    study.optimize(objective, n_trials=config.light_lgbm.optuna.n_trials)
 
     best_model = LGBMClassifier(**study.best_params)
     best_model.fit(
