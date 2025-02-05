@@ -17,4 +17,4 @@ light_lgbm:
     n_splits: 5
     scoring: "roc_auc"
   optuna:
-    n_trials: 20
+    n_trials: 15
