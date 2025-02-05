@@ -1,0 +1,72 @@
+import warnings
+
+import optuna
+from lightgbm import LGBMClassifier
+from sklearn.model_selection import StratifiedKFold, cross_val_score
+
+from tools.config import Config
+
+warnings.filterwarnings("ignore")
+
+
+def train_light_lgbm(config: Config) -> LGBMClassifier:
+    config.logger.info("Starting LGBMClassifier Training")
+
+    def objective(trial):
+        model = LGBMClassifier(
+            boosting_type=trial.suggest_categorical("boosting_type", ["gbdt", "dart"]),
+            num_leaves=trial.suggest_int("num_leaves", 20, 150),
+            learning_rate=trial.suggest_loguniform("learning_rate", 0.01, 0.3),
+            feature_fraction=trial.suggest_uniform("feature_fraction", 0.5, 1.0),
+            bagging_fraction=trial.suggest_uniform("bagging_fraction", 0.5, 1.0),
+            bagging_freq=trial.suggest_int("bagging_freq", 1, 10),
+            min_child_samples=trial.suggest_int("min_child_samples", 1, 100),
+            lambda_l1=trial.suggest_loguniform("lambda_l1", 1e-8, 1),
+            lambda_l2=trial.suggest_loguniform("lambda_l2", 1e-8, 1),
+            random_state=config.random_state,
+            verbose=-1,
+            num_threads=1,
+        )
+
+        cat_cv = StratifiedKFold(
+            n_splits=config.light_lgbm.cross_validation.n_splits,
+            shuffle=True,
+            random_state=config.random_state,
+        )
+
+        model.fit(
+            config.X_train,
+            config.y_train,
+            eval_set=[(config.X_val, config.y_val)],
+            eval_names=["validation"],
+            eval_metric="binary_error",
+        )
+
+        scores = cross_val_score(
+            model,
+            config.X_train,
+            config.y_train,
+            cv=cat_cv,
+            scoring=config.light_lgbm.cross_validation.scoring,
+        )
+
+        return scores.mean()
+
+    config.logger.info("Start study")
+    study = optuna.create_study(direction="maximize")
+    study.optimize(objective, n_trials=10)
+
+    best_model = LGBMClassifier(**study.best_params)
+    best_model.fit(
+        config.X_train,
+        config.y_train,
+        eval_set=[(config.X_val, config.y_val)],
+        eval_names=["validation"],
+        eval_metric="binary_error",
+    )
+
+    config.logger.info(f"Best parameters found: {study.best_params}")
+    config.logger.info(f"Best model score: {study.best_value}")
+    config.logger.info(f"Best validation score: {best_model.evals_result_['validation']['binary_error'][-1]}")
+
+    return best_model

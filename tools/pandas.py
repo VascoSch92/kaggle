@@ -1,6 +1,7 @@
-from typing import List
+from typing import Any, List, Tuple
 from logging import Logger
 
+import pandas as pd
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler, OrdinalEncoder, StandardScaler
 
 from tools.task import Data
@@ -21,6 +22,13 @@ def fill_with_mean(dfs: Data, columns: List[str], logger: Logger) -> Data:
     mean = dfs.train[columns].mean().to_dict()
     dfs.train[columns] = dfs.train[columns].fillna(mean)
     dfs.test[columns] = dfs.test[columns].fillna(mean)
+    return dfs
+
+
+def fill_with_given_value(dfs: Data, columns: List[str], logger: Logger, value: Any) -> Data:
+    logger.info(f"Fill with value {value} features: {columns}")
+    dfs.train[columns] = dfs.train[columns].fillna(value)
+    dfs.test[columns] = dfs.test[columns].fillna(value)
     return dfs
 
 
@@ -63,3 +71,10 @@ def standard_scaling(dfs: Data, logger: Logger) -> Data:
         dfs.train[features] = scaler.fit_transform(dfs.train[features])
         dfs.test[features] = scaler.transform(dfs.test[features])
     return dfs
+
+
+def select_features_and_labels(dfs: Data, logger: Logger) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    logger.info("Select features and labels")
+    X = dfs.train[dfs.schema.numeric_features() + dfs.schema.catvar_features()]
+    y = dfs.train[dfs.schema.labels]
+    return X, y

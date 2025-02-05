@@ -13,6 +13,7 @@ from tools.task import Data, Task
 from tools.logger import log_method_call
 from tools.schema import Schema
 from product_defect.models.catboost import train_catboost
+from product_defect.models.ada_boost import train_ada_bost_classifier
 from product_defect.models.light_lgbm import train_light_lgbm
 from product_defect.models.xgboosting import train_xgboosting
 from product_defect.models.hist_gradient import train_hist_gradient_boosting
@@ -107,6 +108,8 @@ class ProductDefectTrain(Task):
                 return train_bagging_ensemble(params=params)
             case "--random-forest":
                 return train_random_forest_classifier(params=params)
+            case "--ada-boost":
+                return train_ada_bost_classifier(params=params)
             case _:
                 raise KeyError(f"Model {self.model} not found!")
 

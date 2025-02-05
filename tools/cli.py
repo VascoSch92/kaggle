@@ -57,7 +57,7 @@ def retrieve_valid_models(project: str) -> Set[str]:
 
 def validate_model(model: str, project: str) -> None:
     valid_models = retrieve_valid_models(project=project)
-    if model not in valid_models and model != "--etl":
+    if model not in valid_models and valid_models:
         execute_error_message(
             message=f"Pipeline {model} not present.",
             exit_code=1,

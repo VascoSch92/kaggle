@@ -1,0 +1,18 @@
+random_state: 42
+
+paths:
+  data: "./health_factors/data"
+  schema: "./health_factors/data/schema.pkl"
+  train: "./health_factors/data/train.csv"
+  test: "./health_factors/data/test.csv"
+  train_preprocessed: "./health_factors/data/train_processed.csv"
+  test_preprocessed: "./health_factors/data/test_processed.csv"
+
+train:
+  test_size: 0.2
+
+light_lgbm:
+  metric: "asd"
+  cross_validation:
+    n_splits: 5
+    scoring: "roc_auc"

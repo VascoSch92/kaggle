@@ -5,8 +5,10 @@ from tools.task import Pipeline
 from insurance.etl import InsuranceEtl
 from insurance.train import InsuranceTrain
 from mental_health.etl import MentalHealthEtl
+from health_factors.etl import HealthFactorsEtl
 from product_defect.etl import ProductDefectEtl
 from mental_health.train import MentalHealthTrain
+from health_factors.train import HealthFactorsTrain
 from product_defect.train import ProductDefectTrain
 from spaceship_titanic.etl import SpaceshipTitanicEtl
 from spaceship_titanic.train import SpaceshipTitanicTrain
@@ -47,6 +49,12 @@ def main() -> None:
                     Pipeline(ProductDefectEtl).run()
                 case _:
                     Pipeline(ProductDefectEtl, ProductDefectTrain).run()
+        case "health-factors":
+            match model:
+                case "--etl":
+                    Pipeline(HealthFactorsEtl).run()
+                case _:
+                    Pipeline(HealthFactorsEtl, HealthFactorsTrain).run()
         case _:
             execute_error_message(
                 message=f"Project {project} not present.",

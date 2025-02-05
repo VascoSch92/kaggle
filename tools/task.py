@@ -7,7 +7,7 @@ from dataclasses import dataclass
 
 import pandas as pd
 
-from tools.load import load_config
+from tools.config import Config
 from tools.logger import LoggerSetup
 from tools.schema import Schema
 
@@ -18,7 +18,7 @@ class Task(ABC, LoggerSetup):
     def __init__(self) -> None:
         super().__init__()
         if self.config_path:
-            self.config = load_config(filepath=Path(self.config_path))
+            self.config = Config.from_file(filepath=Path(self.config_path))
 
     def skip_task(self) -> bool:
         """Overwrite this method in a subclass if you want to skip the task."""
