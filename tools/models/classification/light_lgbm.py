@@ -3,6 +3,7 @@ import warnings
 import optuna
 from lightgbm import LGBMClassifier
 from sklearn.model_selection import StratifiedKFold, cross_val_score
+import pandas as pd
 
 from tools.config import Config
 
@@ -11,6 +12,9 @@ warnings.filterwarnings("ignore")
 
 def train_light_lgbm(config: Config) -> LGBMClassifier:
     config.logger.info("Starting LGBMClassifier Training")
+
+    X = pd.concat([config.X_train, config.X_val], axis=0, ignore_index=True)
+    y = pd.concat([config.y_train, config.y_val], axis=0, ignore_index=True)
 
     def objective(trial):
         model = LGBMClassifier(
@@ -34,18 +38,10 @@ def train_light_lgbm(config: Config) -> LGBMClassifier:
             random_state=config.random_state,
         )
 
-        model.fit(
-            config.X_train,
-            config.y_train,
-            eval_set=[(config.X_val, config.y_val)],
-            eval_names=["validation"],
-            eval_metric="binary_error",
-        )
-
         scores = cross_val_score(
             model,
-            config.X_train,
-            config.y_train,
+            X,
+            y,
             cv=cat_cv,
             scoring=config.light_lgbm.cross_validation.scoring,
         )
@@ -53,7 +49,7 @@ def train_light_lgbm(config: Config) -> LGBMClassifier:
         return scores.mean()
 
     config.logger.info(f"Start Optuna study with {config.light_lgbm.optuna.n_trials} trials")
-    study = optuna.create_study(direction="maximize")
+    study = optuna.create_study(direction=config.light_lgbm.optuna.direction)
     study.optimize(objective, n_trials=config.light_lgbm.optuna.n_trials)
 
     best_model = LGBMClassifier(**study.best_params)
@@ -62,11 +58,11 @@ def train_light_lgbm(config: Config) -> LGBMClassifier:
         config.y_train,
         eval_set=[(config.X_val, config.y_val)],
         eval_names=["validation"],
-        eval_metric="binary_error",
+        eval_metric=config.light_lgbm.eval_metric,
     )
 
     config.logger.info(f"Best parameters found: {study.best_params}")
     config.logger.info(f"Best model score: {study.best_value}")
-    config.logger.info(f"Best validation score: {best_model.evals_result_['validation']['binary_error'][-1]}")
+    config.logger.info(f"Best validation score: {best_model.evals_result_['validation'][config.light_lgbm.eval_metric][-1]}")
 
     return best_model

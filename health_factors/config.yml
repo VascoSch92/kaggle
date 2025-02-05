@@ -12,9 +12,10 @@ train:
   test_size: 0.2
 
 light_lgbm:
-  metric: "asd"
+  eval_metric: "binary_error"
   cross_validation:
     n_splits: 5
     scoring: "roc_auc"
   optuna:
-    n_trials: 18
+    n_trials: 15
+    direction: "maximize"
