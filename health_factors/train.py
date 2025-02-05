@@ -87,13 +87,15 @@ class HealthFactorsTrain(Task):
         y_val: pd.DataFrame,
         model: Any,
     ) -> None:
-        y_pred = model.predict(X_val)
+        y_pred = model.predict_proba(X_val)[:, 1]
         accuracy = roc_auc_score(y_true=y_val, y_score=y_pred)
         self.logger.info(f"ROC AUC on validation set: {accuracy:.4f}")
 
     @log_method_call
     def _create_submission_dataframe(self, dfs: Data, model: Any) -> pd.DataFrame:
-        submission_pred = model.predict(dfs.test[dfs.schema.numeric_features() + dfs.schema.catvar_features()])
+        submission_pred = model.predict_proba(dfs.test[dfs.schema.numeric_features() + dfs.schema.catvar_features()])[
+            :, 1
+        ]
         submission = pd.DataFrame({"ID": dfs.test.ID, "PCOS": submission_pred})
         return submission
 
