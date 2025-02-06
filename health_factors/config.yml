@@ -18,3 +18,10 @@ light_lgbm:
   optuna:
     n_trials: 50
     direction: "maximize"
+xgboost:
+  cross_validation:
+    n_splits: 5
+    scoring: "roc_auc"
+  optuna:
+    n_trials: 10
+    direction: "maximize"

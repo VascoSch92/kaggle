@@ -3,7 +3,7 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-from sklearn.metrics import roc_auc_score, accuracy_score
+from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import StratifiedKFold, train_test_split
 
 from tools.load import load_schema, load_from_csv
@@ -12,6 +12,7 @@ from tools.task import Data, Task
 from tools.logger import log_method_call
 from tools.pandas import select_features_and_labels
 from tools.models.classification.light_lgbm import train_light_lgbm
+from tools.models.classification.xgboosting import train_xgboost
 
 
 class HealthFactorsTrain(Task):
@@ -62,6 +63,8 @@ class HealthFactorsTrain(Task):
         match self.model:
             case "--light-lgbm":
                 return train_light_lgbm(config=self.config)
+            case "--xgboost":
+                return train_xgboost(config=self.config)
             case _:
                 raise KeyError(f"Model {self.model} not found!")
 
@@ -118,11 +121,13 @@ class HealthFactorsTrain(Task):
 
             model_fold.fit(X_train_fold, y_train_fold)
 
-            pred_valid_fold = model_fold.predict_proba(X_valid_fold)[:,1]
+            pred_valid_fold = model_fold.predict_proba(X_valid_fold)[:, 1]
 
             score = roc_auc_score(y_valid_fold, pred_valid_fold)
             scores.append(score)
-            test_df_pred = model_fold.predict_proba(dfs.test[dfs.schema.numeric_features() + dfs.schema.catvar_features()])[:,1]
+            test_df_pred = model_fold.predict_proba(
+                dfs.test[dfs.schema.numeric_features() + dfs.schema.catvar_features()]
+            )[:, 1]
             test_predictions.append(test_df_pred)
             self.logger.info(f"Fold {i + 1} AUC Score: {score}")
 

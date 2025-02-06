@@ -33,27 +33,3 @@ class Config:
                 raise KeyError(error_msg)
             if isinstance(value, dict):
                 getattr(self, key).validate(value)
-
-
-if __name__ == "__main__":
-    config = Config({})
-    config.add({"key": "value"})
-    config.add(
-        {
-            "a": "b",
-            "c": {
-                "e": 1,
-                "f": 2,
-            },
-        }
-    )
-    print(config.c.e)
-    config.validate(
-        {
-            "a": "b",
-            "c": {
-                "e": 1,
-                "f": 2,
-            },
-        }
-    )
