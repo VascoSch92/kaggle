@@ -118,22 +118,21 @@ class HealthFactorsTrain(Task):
 
             model_fold.fit(X_train_fold, y_train_fold)
 
-            pred_valid_fold = model_fold.predict(X_valid_fold)
+            pred_valid_fold = model_fold.predict_proba(X_valid_fold)[:,1]
 
-            score = accuracy_score(y_valid_fold, pred_valid_fold)
+            score = roc_auc_score(y_valid_fold, pred_valid_fold)
             scores.append(score)
-            test_df_pred = model_fold.predict(dfs.test[dfs.schema.numeric_features() + dfs.schema.catvar_features()])
+            test_df_pred = model_fold.predict_proba(dfs.test[dfs.schema.numeric_features() + dfs.schema.catvar_features()])[:,1]
             test_predictions.append(test_df_pred)
-            self.logger.info(f"Fold {i + 1} Accuracy Score: {score}")
+            self.logger.info(f"Fold {i + 1} AUC Score: {score}")
 
-        self.logger.info(f"mean Accuracy Score: {np.mean(scores):.4f}")
+        self.logger.info(f"AUC Score: {np.mean(scores):.4f}")
 
         submission = pd.DataFrame(
             {
-                "PassengerId": dfs.test.PassengerId,
-                "Transported": np.round(np.mean(test_predictions, axis=0)),
+                "ID": dfs.test.ID,
+                "PCOS": np.mean(test_predictions, axis=0),
             }
         )
-        submission["Transported"] = submission.Transported.astype(bool)
 
         return submission
