@@ -27,8 +27,8 @@ xgboost:
     direction: "maximize"
 ada_boost:
   estimator:
-    module_name: "lightgbm"
-    class_name: "LGBMClassifier"
+    module_name: "catboost"
+    class_name: "CatBoostClassifier"
   cross_validation:
     n_splits: 5
     scoring: "roc_auc"
