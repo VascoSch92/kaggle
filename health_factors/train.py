@@ -11,6 +11,7 @@ from tools.save import save_submission_as_csv
 from tools.task import Data, Task
 from tools.logger import log_method_call
 from tools.pandas import select_features_and_labels
+from tools.models.classification.ada_boost import train_ada_boost
 from tools.models.classification.light_lgbm import train_light_lgbm
 from tools.models.classification.xgboosting import train_xgboost
 
@@ -65,6 +66,8 @@ class HealthFactorsTrain(Task):
                 return train_light_lgbm(config=self.config)
             case "--xgboost":
                 return train_xgboost(config=self.config)
+            case "--ada-boost":
+                return train_ada_boost(config=self.config)
             case _:
                 raise KeyError(f"Model {self.model} not found!")
 

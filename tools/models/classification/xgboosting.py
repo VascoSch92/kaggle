@@ -29,7 +29,7 @@ def train_xgboost(config: Config) -> XGBClassifier:
             booster=trial.suggest_categorical("booster", ["gbtree", "dart", "gblinear"]),
             eta=trial.suggest_float("eta", 0.01, 0.3, log=True),
             max_depth=trial.suggest_int("max_depth", 2, 20),
-            subsample=trial.suggest_float("subsample", 0.1, 1.),
+            subsample=trial.suggest_float("subsample", 0.1, 1.0),
             colsample_bytree=trial.suggest_float("colsample_bytree", 0.2, 1.0),
             tree_method=trial.suggest_categorical("tree_method", ["auto", "hist", "approx"]),
             scale_pos_weight=scale_pos_weight,

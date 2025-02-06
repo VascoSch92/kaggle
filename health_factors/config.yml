@@ -25,3 +25,13 @@ xgboost:
   optuna:
     n_trials: 20
     direction: "maximize"
+ada_boost:
+  estimator:
+    module_name: "lightgbm"
+    class_name: "LGBMClassifier"
+  cross_validation:
+    n_splits: 5
+    scoring: "roc_auc"
+  optuna:
+    n_trials: 5
+    direction: "maximize"
