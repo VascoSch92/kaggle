@@ -23,5 +23,5 @@ xgboost:
     n_splits: 5
     scoring: "roc_auc"
   optuna:
-    n_trials: 10
+    n_trials: 20
     direction: "maximize"
