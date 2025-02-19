@@ -83,3 +83,15 @@ Playground Series - Season 4, Episode 12
 |-------------------------------------------------------------|--------------|---------------|
 | `32e0a842(insurance --stacking-regressor --stratification)` | 1.04487      | 1.04665       |
 | `07bf2a1d(insurance --light-lgbm --stratification)`         | 1.04487      | 1.04675       |
+
+
+### Exploring Predictive Health Factors
+
+**Page of the competition:** [link](https://www.kaggle.com/competitions/exploring-predictive-health-factors)
+
+**Ranked:** 23/138 (top 17%)
+
+| Commit Message                           | Public Score | Private Score |
+|------------------------------------------|--------------|---------------|
+| `74b12e68(health-factors --light-lgbm)`  | 0.916        | 0.796         |
+| `c412e12e(health-factors --light-lgbm)`  | 0.913        | 0.798         |
